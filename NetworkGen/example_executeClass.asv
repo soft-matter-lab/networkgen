@@ -1,7 +1,0 @@
-n = network;
-
-n.arch
-n.flags.isave = false;
-
-
-printOptions(n)

@@ -36,6 +36,10 @@ function [AtomsOut, BondsOut] = NetworkAddHeterogeneities(Atoms, Bonds, Domain, 
 % -------------------------------------------------------------------------
 % OPTIONS
 %
+%  Global switch
+%   .enable          true             Set to false to skip all void insertion
+%                                     and return Atoms/Bonds unchanged.
+%
 %  Void count / density
 %   .density_mode    'count'          Total void count  (default)
 %                    'area_fraction'  Drive coverage toward a target fraction
@@ -105,6 +109,34 @@ function [AtomsOut, BondsOut] = NetworkAddHeterogeneities(Atoms, Bonds, Domain, 
 %   .margin_frac     0.0              Fraction of radius_mean kept as margin
 %                                     from domain boundary (0 = no margin)
 %
+%  Isolated atom cleanup
+%   .prune_isolated  true             Remove any atoms that have no bonds
+%                                     remaining after void removal.  These are
+%                                     dangling crosslinks with nothing to
+%                                     connect to, which would cause problems
+%                                     in LAMMPS.  Default is true; set false
+%                                     only if you want to inspect the raw
+%                                     removal result before cleanup.
+%
+%  Sparse / foam network mode
+%   .sparse_network  false            false : normal mode -- only void interiors
+%                                             are removed.  Space between voids
+%                                             remains fully populated.
+%                                     true  : foam mode -- atoms that are far
+%                                             from all void surfaces are ALSO
+%                                             removed.  Only a thin shell of
+%                                             crosslinks survives around each
+%                                             void, forming bond-bridges between
+%                                             them.  Mimics the sparse foam-like
+%                                             topology of hydrogel networks.
+%   .wall_thickness  3*min_node_sep   Thickness of the shell of crosslinks
+%                                     retained around each void surface in
+%                                     sparse mode.  Larger values give thicker
+%                                     bridges; smaller values give more
+%                                     thread-like connections.  A reasonable
+%                                     starting range is 2-6 * min_node_sep.
+%                                     [only used when sparse_network = true]
+%
 %  Clamp regions  (defect-free bands at top and bottom of domain)
 %   .clamp_frac      0.0              Fraction of total domain height (Ly) to
 %                                     reserve as a clamp band at EACH end.
@@ -164,6 +196,7 @@ function [AtomsOut, BondsOut] = NetworkAddHeterogeneities(Atoms, Bonds, Domain, 
         default_r = 0.05 * min(Lx, Ly);
     end
 
+    options = set_default(options, 'enable',          true);
     options = set_default(options, 'density_mode',    'count');
     options = set_default(options, 'n_voids',         10);
     options = set_default(options, 'void_area_frac',  0.10);
@@ -180,12 +213,25 @@ function [AtomsOut, BondsOut] = NetworkAddHeterogeneities(Atoms, Bonds, Domain, 
     options = set_default(options, 'center_distribution', 'random');
     options = set_default(options, 'margin_frac',         0.0);
     options = set_default(options, 'clamp_frac',          0.0);
+    options = set_default(options, 'sparse_network',      false);
+    options = set_default(options, 'wall_thickness',      3.0 * Domain.min_node_sep);
+    options = set_default(options, 'prune_isolated',      true);
     % n_cluster_parents and cluster_spread depend on n_voids / domain size,
     % so their defaults are set later, after n_voids is determined.
 
     r_mean    = options.radius_mean;
     roughness = options.shape_roughness;
     n_modes   = max(1, round(options.shape_n_modes));
+
+    %% ------------------------------------------------------------------ %%
+    %                  0b.  Early exit if disabled                          %
+    %% ------------------------------------------------------------------ %%
+    if ~options.enable
+        fprintf('   [Heterogeneities] Skipped (enable=false)\n');
+        AtomsOut = Atoms;
+        BondsOut = Bonds;
+        return;
+    end
 
     %% ------------------------------------------------------------------ %%
     %              1.  Determine number of voids to place                   %
@@ -443,13 +489,32 @@ function [AtomsOut, BondsOut] = NetworkAddHeterogeneities(Atoms, Bonds, Domain, 
     end
 
     %% ------------------------------------------------------------------ %%
-    %              5.  Classify atoms as inside or outside voids            %
+    %              5.  Classify atoms as inside / outside / near voids      %
+    %                                                                        %
+    %  For each atom we track two flags:                                     %
+    %    in_void       : atom is inside a void interior  -> always removed   %
+    %    near_boundary : atom is within wall_thickness of at least one void  %
+    %                    surface (measured from outside) -> kept in sparse   %
+    %                    mode; ignored in normal mode                        %
+    %                                                                        %
+    %  Normal mode  (sparse_network = false):                                %
+    %    remove = in_void                                                     %
+    %                                                                        %
+    %  Sparse / foam mode  (sparse_network = true):                          %
+    %    remove = in_void | ~near_boundary                                   %
+    %    Only atoms in the thin shell just outside each void surface are     %
+    %    kept, giving thin bond-bridges between voids -- the foam topology   %
+    %    seen in hydrogel networks.                                          %
     %% ------------------------------------------------------------------ %%
-    natom   = size(Atoms, 1);
-    in_void = false(natom, 1);
+    natom        = size(Atoms, 1);
+    in_void      = false(natom, 1);
+    near_boundary = false(natom, 1);   % only used when sparse_network = true
 
     atom_x = Atoms(:, 2);
     atom_y = Atoms(:, 3);
+
+    do_sparse  = logical(options.sparse_network);
+    wall_t     = options.wall_thickness;
 
     for v = 1:n_voids
         cx_v    = centers(v, 1);
@@ -463,48 +528,62 @@ function [AtomsOut, BondsOut] = NetworkAddHeterogeneities(Atoms, Bonds, Domain, 
         dy = atom_y - cy_v;
         dist2_all = dx .* dx + dy .* dy;
 
-        % Bounding-circle pre-filter: only examine atoms within the
-        % maximum possible void radius to avoid expensive computation
-        outer_R   = (1.0 + roughness) * R_v;
-        candidate = find(dist2_all < outer_R * outer_R & ~in_void);
+        % Outer search radius: void surface + wall thickness (for near-boundary
+        % test) is the widest region we ever need to examine per void.
+        outer_R  = (1.0 + roughness) * R_v + wall_t;
+        candidate = find(dist2_all < outer_R * outer_R);
 
         if isempty(candidate),  continue;  end
 
-        % For candidate atoms compute local void radius at their angle
+        % Compute local (rough) void radius at each candidate atom's angle
         theta_c = atan2(dy(candidate), dx(candidate));  % [nc x 1]
 
-        % Vectorised Fourier sum over modes
-        % perturbation(i) = sum_m( wts(m) * cos(k_vals(m)*theta_c(i) + phis(m)) )
-        % Build angle-mode matrix: [nc x n_modes]
-        k_mat   = repmat(k_vals,  numel(candidate), 1);   % [nc x nm]
-        phi_mat = repmat(phis,    numel(candidate), 1);   % [nc x nm]
-        w_mat   = repmat(wts,     numel(candidate), 1);   % [nc x nm]
-        th_mat  = repmat(theta_c, 1, n_modes);            % [nc x nm]
+        k_mat   = repmat(k_vals,  numel(candidate), 1);
+        phi_mat = repmat(phis,    numel(candidate), 1);
+        w_mat   = repmat(wts,     numel(candidate), 1);
+        th_mat  = repmat(theta_c, 1, n_modes);
 
         perturbation = sum(w_mat .* cos(k_mat .* th_mat + phi_mat), 2);  % [nc x 1]
-
-        r_local = R_v * max(0.1, 1 + roughness * perturbation);  % [nc x 1]
-        % (max ensures r_local stays positive even for strong roughness)
+        r_local = R_v * max(0.1, 1 + roughness * perturbation);          % [nc x 1]
 
         dist_c = sqrt(dist2_all(candidate));   % [nc x 1]
 
-        in_void(candidate(dist_c < r_local)) = true;
+        % Inside void
+        inside = dist_c < r_local;
+        in_void(candidate(inside)) = true;
+
+        % Near boundary from outside: beyond void surface but within wall_t
+        if do_sparse
+            near = ~inside & (dist_c < r_local + wall_t);
+            near_boundary(candidate(near)) = true;
+        end
     end
 
     % Protect atoms inside the clamp bands -- they must never be removed
     if clamp_h > 0
-        in_clamp         = (atom_y <= clamp_ylo) | (atom_y >= clamp_yhi);
-        in_void(in_clamp) = false;
+        in_clamp              = (atom_y <= clamp_ylo) | (atom_y >= clamp_yhi);
+        in_void(in_clamp)      = false;
+        near_boundary(in_clamp) = true;   % treat clamp atoms as always "near boundary"
     end
 
-    n_removed = sum(in_void);
+    % Determine final removal mask
+    if do_sparse
+        % Foam mode: remove void interiors AND atoms far from all void surfaces
+        remove_mask = in_void | ~near_boundary;
+        fprintf('   [Heterogeneities] sparse_network mode  (wall_thickness=%.2g)\n', wall_t);
+    else
+        % Normal mode: only remove void interiors
+        remove_mask = in_void;
+    end
+
+    n_removed = sum(remove_mask);
     fprintf('   [Heterogeneities] Marking %d / %d atoms for removal (%.1f%%)\n', ...
         n_removed, natom, 100.0 * n_removed / max(natom, 1));
 
     %% ------------------------------------------------------------------ %%
     %                  6.  Remove atoms inside voids                        %
     %% ------------------------------------------------------------------ %%
-    AtomsOut = Atoms(~in_void, :);
+    AtomsOut = Atoms(~remove_mask, :);
 
     if isempty(AtomsOut)
         warning(['NetworkAddHeterogeneities: ALL atoms were removed. ' ...
@@ -531,6 +610,137 @@ function [AtomsOut, BondsOut] = NetworkAddHeterogeneities(Atoms, Bonds, Domain, 
     n_bonds_rm = size(Bonds, 1) - size(BondsOut, 1);
     fprintf('   [Heterogeneities] Removed %d / %d bonds\n', ...
         n_bonds_rm, size(Bonds, 1));
+
+    %% ------------------------------------------------------------------ %%
+    %          7b.  Prune isolated atoms (degree = 0 after bond removal)    %
+    %% ------------------------------------------------------------------ %%
+    if options.prune_isolated && ~isempty(BondsOut) && ~isempty(AtomsOut)
+        % Count degree of each surviving atom from BondsOut (old ID space)
+        surviving_ids = AtomsOut(:, 1);
+        natom_surv    = numel(surviving_ids);
+        degree        = zeros(natom_surv, 1);
+
+        % Build a fast old-ID -> local-index map
+        id_map = containers.Map('KeyType','int64','ValueType','int32');
+        for ii = 1:natom_surv
+            id_map(int64(surviving_ids(ii))) = int32(ii);
+        end
+        for k = 1:size(BondsOut, 1)
+            r1 = id_map(int64(BondsOut(k, 2)));
+            r2 = id_map(int64(BondsOut(k, 3)));
+            degree(r1) = degree(r1) + 1;
+            degree(r2) = degree(r2) + 1;
+        end
+
+        isolated      = degree == 0;
+        n_isolated    = sum(isolated);
+        if n_isolated > 0
+            AtomsOut = AtomsOut(~isolated, :);
+            fprintf('   [Heterogeneities] Pruned %d isolated atoms (degree=0)\n', n_isolated);
+        end
+    elseif options.prune_isolated && isempty(BondsOut) && ~isempty(AtomsOut)
+        % No bonds at all -- every atom is isolated
+        n_isolated = size(AtomsOut, 1);
+        AtomsOut   = zeros(0, size(AtomsOut, 2));
+        fprintf('   [Heterogeneities] Pruned %d isolated atoms (no bonds remain)\n', n_isolated);
+    end
+
+    %% ------------------------------------------------------------------ %%
+    %     7c.  Remove small disconnected clusters                           %
+    %                                                                       %
+    %  After void removal, the network may contain small fragments --       %
+    %  a handful of atoms connected to each other but completely cut off    %
+    %  from the main network.  Only the largest connected component is      %
+    %  kept; everything else is discarded.                                  %
+    %                                                                       %
+    %  Implementation: union-find (path compression + union by rank).      %
+    %  Operates in original ID space, before renumbering.                  %
+    %% ------------------------------------------------------------------ %%
+    if ~isempty(AtomsOut) && ~isempty(BondsOut)
+
+        surv_ids  = AtomsOut(:, 1);          % original IDs of surviving atoms
+        n_surv    = numel(surv_ids);
+
+        % Map original ID -> local index (1..n_surv)
+        id_to_loc = containers.Map('KeyType','int64','ValueType','int32');
+        for ii = 1:n_surv
+            id_to_loc(int64(surv_ids(ii))) = int32(ii);
+        end
+
+        % --- Union-Find initialisation ---
+        uf_parent = int32(1:n_surv);   % parent(i) = i  (each node its own root)
+        uf_rank   = zeros(n_surv,1,'int32');
+
+        % --- Union bonds (uf_find inlined -- MATLAB forbids nested functions) ---
+        for k = 1:size(BondsOut,1)
+            loc1 = id_to_loc(int64(BondsOut(k,2)));
+            loc2 = id_to_loc(int64(BondsOut(k,3)));
+
+            % find root of loc1 with path halving
+            x = loc1;
+            while uf_parent(x) ~= x
+                uf_parent(x) = uf_parent(uf_parent(x));
+                x = uf_parent(x);
+            end
+            r1 = x;
+
+            % find root of loc2 with path halving
+            x = loc2;
+            while uf_parent(x) ~= x
+                uf_parent(x) = uf_parent(uf_parent(x));
+                x = uf_parent(x);
+            end
+            r2 = x;
+
+            if r1 ~= r2
+                if uf_rank(r1) < uf_rank(r2)
+                    uf_parent(r1) = r2;
+                elseif uf_rank(r1) > uf_rank(r2)
+                    uf_parent(r2) = r1;
+                else
+                    uf_parent(r2) = r1;
+                    uf_rank(r1)   = uf_rank(r1) + 1;
+                end
+            end
+        end
+
+        % --- Find root of every node (full compression pass, inlined) ---
+        roots = zeros(n_surv,1,'int32');
+        for ii = 1:n_surv
+            x = ii;
+            while uf_parent(x) ~= x
+                uf_parent(x) = uf_parent(uf_parent(x));
+                x = uf_parent(x);
+            end
+            roots(ii) = x;
+        end
+
+        % --- Count component sizes and find the largest ---
+        comp_sizes = accumarray(double(roots), ones(n_surv,1), [], @sum);
+        [~, main_root] = max(comp_sizes);
+        main_root = int32(main_root);
+
+        in_main = (roots == main_root);
+        n_small = sum(~in_main);
+
+        if n_small > 0
+            % Remove atoms not in main component
+            AtomsOut  = AtomsOut(in_main, :);
+            keep_ids  = surv_ids(in_main);
+
+            % Remove bonds whose endpoints are not both in main component
+            keep_b1  = ismember(BondsOut(:,2), keep_ids);
+            keep_b2  = ismember(BondsOut(:,3), keep_ids);
+            BondsOut = BondsOut(keep_b1 & keep_b2, :);
+
+            fprintf(['   [Heterogeneities] Removed %d atoms and %d bonds ' ...
+                     'in small disconnected clusters\n'], ...
+                n_small, sum(~(keep_b1 & keep_b2)));
+        else
+            fprintf('   [Heterogeneities] No small clusters found\n');
+        end
+
+    end
 
     %% ------------------------------------------------------------------ %%
     %            8.  Renumber atom IDs and bond endpoints                   %
