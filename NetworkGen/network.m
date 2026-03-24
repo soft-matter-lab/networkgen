@@ -4,6 +4,9 @@ properties
 
     % Define properites and set default parameters
 
+    %%% replicate count
+    Nreplicates = 1;
+
     %%% Flags
     flags = struct(...
         'isave',                true, ...
@@ -118,30 +121,30 @@ methods
 
         obj.domain.scale = 5;
         %%% Loop over replicates
-        for ii=1 %Nreps
+        for ii= 1:obj.Nreplicates %Nreps
 
             % ---------------------------------------------------------
             % 1. Prepare replicate-specific information
             % ---------------------------------------------------------
-            obj = localPrepareReplicate(obj, ii, Nreplicates);
+            localPrepareReplicate(obj, ii, obj.Nreplicates);
 
             % ---------------------------------------------------------
             % 2. Construct domain
             % ---------------------------------------------------------
             SetupDomain(obj);
-            % New version of SetupDomain should read from obj.domain, % obj.arch, ...
+            % New version of SetupDomain should read from obj.domain, obj.arch, ...
             
             % ---------------------------------------------------------
             % 3. Add atoms
             % ---------------------------------------------------------
             Atoms = AddAtoms(obj);
-
+            % Decides internally to do random or hex based on geometry flag
             % ---------------------------------------------------------
             % 4. Assign per/atom
             % ---------------------------------------------------------
             Atoms = AssignPerAtom(obj, Atoms);
             % AssignPerAtom should read per-atom settings (if any) from obj
-            % Decides internally to do random or hex based on geometry flag
+           
 
             % ---------------------------------------------------------
             % 5. Add bonds
@@ -157,7 +160,7 @@ methods
             % ---------------------------------------------------------
             % 7. Add defects
             % ---------------------------------------------------------
-            [Atoms, Bonds] = AddDefects(obj, Atoms, Bonds, Nvec);
+            [Atoms, Bonds, Nvec] = AddDefects(obj, Atoms, Bonds, Nvec);
             % AddDefects should read obj.defect
 
             % ---------------------------------------------------------
