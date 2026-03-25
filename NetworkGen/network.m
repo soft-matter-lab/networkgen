@@ -125,7 +125,7 @@ methods
             % ---------------------------------------------------------
             % 3. Add atoms
             % ---------------------------------------------------------
-            Atoms = AddAtoms(obj);
+            [Atoms, LatticeData] = AddAtoms(obj);
             % Decides internally to do random or hex based on geometry flag
             % ---------------------------------------------------------
             % 4. Assign per/atom
