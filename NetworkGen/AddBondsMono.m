@@ -55,11 +55,11 @@ function [AtomsOut, BondsOut] = connect_random_mono(obj, Atoms)
     % use lattice spacing as the characteristic local bond scale
     a = obj.domain.min_node_sep;
     if isempty(obj.architecture.spacing_multiplier)
-        spacing_multiplier = 1.0;
+        spacing_multiplier = 1.2;
     else
         spacing_multiplier = obj.architecture.spacing_multiplier;
     end
-    Rcut = 1.85 * a * spacing_multiplier;
+    Rcut = a * spacing_multiplier;
     Rcut2 = Rcut * Rcut;
 
     ids = Atoms(:,1);

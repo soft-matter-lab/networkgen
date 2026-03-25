@@ -57,7 +57,7 @@ function [AtomsOut, BondsOut] = connect_general_poly(obj, Atoms)
     else
         spacing_multiplier = obj.architecture.spacing_multiplier;
     end
-    Rcut = 2.25 * a * spacing_multiplier;
+    Rcut = a * spacing_multiplier;
     Rcut2 = Rcut * Rcut;
 
     ids = Atoms(:,1);
