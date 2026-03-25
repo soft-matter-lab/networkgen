@@ -78,7 +78,7 @@ const config: Config = {
       title: 'NetworkGen',
       logo: {
         alt: 'My Site Logo',
-        src: 'img/logo.svg',
+        src: 'img/netgenlogo.png',
       },
       items: [
         {
@@ -133,12 +133,12 @@ const config: Config = {
             },
             {
               label: 'GitHub',
-              href: 'https://github.com/facebook/docusaurus',
+              href: 'https://github.com/soft-matter-lab/networkgen',
             },
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} My Project, Inc. Built with Docusaurus.`,
+      copyright: `Copyright © ${new Date().getFullYear()} Soft Matter Lab, University of Colorado Boulder. Built with Docusaurus.`,
     },
     prism: {
       theme: prismThemes.github,
