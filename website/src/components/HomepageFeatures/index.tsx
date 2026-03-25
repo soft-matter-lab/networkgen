@@ -5,48 +5,52 @@ import styles from './styles.module.css';
 
 type FeatureItem = {
   title: string;
-  Svg: React.ComponentType<React.ComponentProps<'svg'>>;
-  description: ReactNode;
+  Svg?: React.ComponentType<React.ComponentProps<'svg'>>;
+  img?: string;
+  description: React.ReactNode;
 };
 
 const FeatureList: FeatureItem[] = [
   {
-    title: 'Easy to Use',
-    Svg: require('@site/static/img/undraw_docusaurus_mountain.svg').default,
+    title: 'Customize network architecture',
+    Svg: require('@site/static/img/network_arch_main.svg').default,
     description: (
       <>
-        Docusaurus was designed from the ground up to be easily installed and
-        used to get your website up and running quickly.
+        NetworkGen allows for easy customization of network architecture, 
+        including control over geometry, strand connectivity, and typology.
       </>
     ),
   },
   {
-    title: 'Focus on What Matters',
-    Svg: require('@site/static/img/undraw_docusaurus_tree.svg').default,
+    title: 'Control network statistics',
+    img: require('@site/static/img/network_gauss_main.png').default,
     description: (
       <>
-        Docusaurus lets you focus on your docs, and we&apos;ll do the chores. Go
-        ahead and move your docs into the <code>docs</code> directory.
+        Precisely control network statistics, including strand length distribution,
+        crosslink functionality, and more.
       </>
     ),
   },
-  {
-    title: 'Powered by React',
-    Svg: require('@site/static/img/undraw_docusaurus_react.svg').default,
-    description: (
-      <>
-        Extend or customize your website layout by reusing React. Docusaurus can
-        be extended while reusing the same header and footer.
-      </>
-    ),
-  },
+{
+  title: 'Ready for LAMMPS',
+  img: '/networkgen/img/networkfracture.gif',
+  description: (
+    <>
+      NetworkGen data and table files are designed to work directly with LAMMPS. Generate your network
+      and get started with your simulations! 
+    </>
+  ),
+},
 ];
 
-function Feature({title, Svg, description}: FeatureItem) {
+function Feature({title, Svg, img, description}: FeatureItem) {
   return (
     <div className={clsx('col col--4')}>
       <div className="text--center">
-        <Svg className={styles.featureSvg} role="img" />
+        {Svg 
+          ? <Svg className={styles.featureSvg} role="img" />
+          : <img src={img} alt={title} className={styles.featureSvg} />
+        }
       </div>
       <div className="text--center padding-horiz--md">
         <Heading as="h3">{title}</Heading>
