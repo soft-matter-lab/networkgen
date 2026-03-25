@@ -3,7 +3,7 @@ classdef architecture
 properties
 
     %%% Architecture
-    geometry = 'random'
+    geometry = 'random'                     % 'random', 'hex_lattice'
     strand_typology assignmentmode = assignmentmode();
     types = struct(...
         'natom_type',           1, ...
