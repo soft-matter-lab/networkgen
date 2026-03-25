@@ -73,17 +73,21 @@ lattice_max_del_per_node        = 1;     % max bonds to attempt to delete per no
 lattice_min_degree_keep         = 5;     % don't let any node go below this degree
 
 %% --------------------- Lattice Heterogeneities Options ------------------
+%options.enable = false;
+options.sparse_network      = true;
 options.density_mode        = 'area_fraction';
-options.void_area_frac      = 0.95;             % 15% of domain is void
+options.void_area_frac      = 0.75;             % 15% of domain is void
 options.size_dist           = 'gaussian';       % sparse regions vary in size 'fixed' or 'gaussian' or 'exponential'
 options.radius_mean         = 12*b;
+options.radius_min          = 2*b;
+options.radius_max          = 30*b;
 options.shape_roughness     = .3; % 0-1
 options.shape_n_modes       = 2;
 options.void_overlap        = false;
-options.bridge_width        = 3*b;
+options.bridge_width        = 1*b;
 options.center_distribution = 'clustered';
 options.clamp_frac          = 0.12;
-options.margin_frac         = 0.1;
+options.margin_frac         = 0.15;
 
 %%% --------------------- Distribution OPTIONS -------------------------%%%
 %% --------------------- Polydisperse Options -----------------------------
@@ -205,8 +209,8 @@ options.polydisperse.N_target_min    = 5;       % integer lower target
 options.polydisperse.N_target_max    = 120;      % integer upper target
 
 % --- 'pmf' mode (truncated geometric with hard cap based on exp distribution) ---
-options.polydisperse.pmf_nu0         = 3;       % ν0 (minimum)
-options.polydisperse.pmf_meanN       = 5;       % target mean of ν after truncation
+options.polydisperse.pmf_nu0         = 3;       % ν0 (minimum) 3 (20)
+options.polydisperse.pmf_meanN       = 5;       % target mean of ν after truncation 5 (40)
 options.polydisperse.pmf_cut_mode    = 'cap';    % keep as 'cap'
 options.polydisperse.pmf_nu_max      = 10;       % hard maximum ν (≥ ν0) -120 (10)
 options.polydisperse.integerize_rule = 'largest_remainder'; % allocation method
