@@ -20,7 +20,7 @@ function [Atoms, LatticeData] = AddAtoms(obj)
             Atoms = AddAtomsRandom(obj);
             LatticeData = [];
 
-        case 'hex'
+        case 'hex_lattice'
             [Atoms, LatticeData] = AddAtomsHex(obj);
 
         otherwise
