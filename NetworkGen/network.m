@@ -105,7 +105,6 @@ methods
 
     function [] = generateNetwork(obj)
 
-        obj.domain.scale = 5;
         %%% Loop over replicates
         for ii= 1:obj.Nreplicates %Nreps
 
