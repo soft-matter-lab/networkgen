@@ -3,6 +3,8 @@ classdef assignmentmode
 
         auto = true;
 
+        mode = 'mono';
+
         %%% Mono assignment
         mono = struct(...
             'value',                20 ...
