@@ -22,7 +22,7 @@ const config: Config = {
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
-  organizationName: 'Soft Matter Lab', // Usually your GitHub org/user name.
+  organizationName: 'soft-matter-lab', // Usually your GitHub org/user name.
   projectName: 'networkgen', // Usually your repo name.
   trailingSlash: false,
   onBrokenLinks: 'throw',
@@ -34,6 +34,18 @@ const config: Config = {
     defaultLocale: 'en',
     locales: ['en'],
   },
+
+  plugins:[
+    [
+      '@docusaurus/plugin-content-docs',
+      {
+        id: 'tutorial',
+        path: 'tutorial',
+        routeBasePath: 'tutorial',
+        sidebarPath: './sidebars.ts',
+      },
+    ],
+  ],
 
   presets: [
     [
@@ -83,11 +95,18 @@ const config: Config = {
       items: [
         {
           type: 'docSidebar',
+          sidebarId: 'documentationSidebar',
+          position: 'left',
+          label: 'Documentation',
+        },
+        {
+          type: 'docSidebar',
           sidebarId: 'tutorialSidebar',
+          docsPluginId: 'tutorial',
           position: 'left',
           label: 'Tutorial',
         },
-        {to: '/blog', label: 'Blog', position: 'left'},
+        {to: '/about', label: 'About', position: 'left'},
         {
           href: 'https://github.com/soft-matter-lab/networkgen',
           label: 'GitHub',
@@ -102,9 +121,14 @@ const config: Config = {
           title: 'Docs',
           items: [
             {
-              label: 'Tutorial',
+              label: 'Documentation',
               to: '/docs/intro',
             },
+            {
+              label: 'Tutorial',
+              to: '/tutorial/name',
+            },
+
           ],
         },
         {
@@ -125,11 +149,15 @@ const config: Config = {
           ],
         },
         {
-          title: 'More',
+          title: 'External Links',
           items: [
             {
-              label: 'Blog',
-              to: '/blog',
+              label: 'Vernerey Lab',
+              href: 'https://www.colorado.edu/lab/vernerey/',
+            },
+            {
+              label: 'LAMMPS',
+              href: 'https://www.lammps.org/',
             },
             {
               label: 'GitHub',
