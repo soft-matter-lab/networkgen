@@ -1,7 +1,7 @@
 ---
-title: Markdown page example
+title: About NetworkGen
 ---
 
-# Markdown page example
+# About NetworkGen
 
 You don't need React to write simple standalone pages.
