@@ -1,0 +1,8 @@
+{
+  "label": "Assignment Modes",
+  "position": 5,
+  "link": {
+    "type": "generated-index",
+    "description": "Sub-settings for controlling bond length and stiffness distributions."
+  }
+}

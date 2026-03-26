@@ -1,0 +1,8 @@
+{
+  "label": "Network Architecture",
+  "position": 4,
+  "link": {
+    "type": "generated-index",
+    "description": "Settings for controlling node placement geometry and strand length distribution."
+  }
+}

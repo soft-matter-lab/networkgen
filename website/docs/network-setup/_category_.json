@@ -1,0 +1,8 @@
+{
+  "label": "Network Setup",
+  "position": 3,
+  "link": {
+    "type": "generated-index",
+    "description": "Settings for defining the simulation domain, boundary conditions, and output files."
+  }
+}
