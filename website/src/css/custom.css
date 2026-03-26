@@ -4,7 +4,6 @@
  * work well for content-centric websites.
  */
 
-/* You can override the default Infima variables here. */
 :root {
   --ifm-color-primary: #5d58ac;
   --ifm-color-primary-dark: #1f4177;
@@ -17,9 +16,14 @@
   --ifm-color-success: #3c2ebe;
   --ifm-code-font-size: 95%;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+
+  /* Light mode surface: very subtle lavender tint */
+  --ifm-background-color: #faf9ff;
+  --ifm-background-surface-color: #ffffff;
+  --ifm-navbar-background-color: #ffffff;
+  --ifm-footer-background-color: #1a1628;
 }
 
-/* For readability concerns, you should choose a lighter palette in dark mode. */
 [data-theme='dark'] {
   --ifm-color-primary: #5852a7;
   --ifm-color-secondary: #a7a2d1;
@@ -30,5 +34,41 @@
   --ifm-color-primary-lighter: #a2bce7;
   --ifm-color-primary-lightest: #cad9f1;
   --ifm-background-color: #181920;
+  --ifm-background-surface-color: #1e1f2a;
+  --ifm-navbar-background-color: #181920;
+  --ifm-footer-background-color: #12121a;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+}
+
+/* Navbar — thin bottom border instead of heavy shadow */
+.navbar {
+  box-shadow: none;
+  border-bottom: 0.5px solid var(--ifm-color-emphasis-200);
+}
+
+/* Footer — use the dark purple bg defined above */
+.footer {
+  background: var(--ifm-footer-background-color) !important;
+}
+
+/* Slightly tighter navbar */
+.navbar__inner {
+  padding: 0 1.5rem;
+}
+
+/* Docusaurus sidebar scrollbar refinement */
+.theme-doc-sidebar-container {
+  border-right: 0.5px solid var(--ifm-color-emphasis-200) !important;
+  box-shadow: none !important;
+}
+
+/* Admonition refinements */
+.alert {
+  border-radius: 6px;
+  border-width: 0.5px;
+}
+
+/* Code blocks */
+.prism-code {
+  border-radius: 6px;
 }
