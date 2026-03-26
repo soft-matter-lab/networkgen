@@ -22,7 +22,8 @@ net.architecture.rho_atom           = 0.0078;
 net.peratom.Max_peratom_bond        = 6;
 
 %% ---- Strand typology ----
-net.architecture.strand_typology.mode = 'bimodal';
+net.architecture.strand_typology.auto = false;
+net.architecture.strand_typology.mode = 'mono';
 net.architecture.strand_typology.bimodal.method       = 'gaussian';
 net.architecture.strand_typology.bimodal.mean_1       = 10;
 net.architecture.strand_typology.bimodal.mean_2       = 40;
@@ -42,17 +43,20 @@ net.architecture.strand_typology.bimodal.auto_2_flag = true;
 net.architecture.strand_typology.bimodal.stdR_1 = 3;
 net.architecture.strand_typology.bimodal.stdR_2 = 10;
 
+net.architecture.strand_typology.mono.value = 100;
+
 %% ---- Perbond ----
-net.perbond.kuhn = net.architecture.strand_typology;
+% net.perbond.kuhn.mono.value = 10;
+% net.perbond.kuhn = net.architecture.strand_typology;
 
 %% ---- Flags ----
-net.flags.isave      = false;
+net.flags.isave      = true;
 net.flags.iplot      = true;
 net.flags.ilog       = true;
 net.flags.savemode   = true;
 net.flags.imanualseed = false;
 net.flags.idefect    = false;
-net.flags.ipotential = false;
+net.flags.ipotential = true;
 
 %% ---- Generate ----
 net.generateNetwork();

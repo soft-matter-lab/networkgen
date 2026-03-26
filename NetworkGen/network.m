@@ -123,6 +123,7 @@ methods
             % 2. Construct domain
             % ---------------------------------------------------------
             SetupDomain(obj);
+            syncKuhnAssignmentFromTopology(obj);
             % New version of SetupDomain should read from obj.domain, obj.arch, ...
             
             % ---------------------------------------------------------
