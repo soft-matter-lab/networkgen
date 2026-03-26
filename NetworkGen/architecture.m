@@ -3,7 +3,7 @@ classdef architecture
 properties
 
     %%% Architecture
-    geometry = 'random'
+    geometry = 'random'                     % 'random', 'hex_lattice'
     strand_typology assignmentmode = assignmentmode();
     types = struct(...
         'natom_type',           1, ...
@@ -21,7 +21,7 @@ properties
     lattice_spacing =           6;
     spacing_multiplier_mode =   'auto';
     spacing_multiplier =        1;
-    lattice_disorde_level =     1;
+    lattice_disorder_level =     1;
     lattice_disorder_maxfrac =  0.4;
     lattice_max_del_per_node =  1;
     lattice_min_degree_keep =   5;

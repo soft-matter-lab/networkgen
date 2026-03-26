@@ -7,7 +7,7 @@ import type * as Preset from '@docusaurus/preset-classic';
 const config: Config = {
   title: 'NetworkGen',
   tagline: 'Generate polymer networks with ease',
-  favicon: 'img/favicon.ico',
+  favicon: 'img/labicon.ico',
 
   // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
   future: {
@@ -22,7 +22,7 @@ const config: Config = {
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
-  organizationName: 'Soft Matter Lab', // Usually your GitHub org/user name.
+  organizationName: 'soft-matter-lab', // Usually your GitHub org/user name.
   projectName: 'networkgen', // Usually your repo name.
   trailingSlash: false,
   onBrokenLinks: 'throw',
@@ -35,6 +35,18 @@ const config: Config = {
     locales: ['en'],
   },
 
+  plugins:[
+    [
+      '@docusaurus/plugin-content-docs',
+      {
+        id: 'tutorial',
+        path: 'tutorial',
+        routeBasePath: 'tutorial',
+        sidebarPath: './sidebars.ts',
+      },
+    ],
+  ],
+
   presets: [
     [
       'classic',
@@ -44,7 +56,7 @@ const config: Config = {
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl:
-            'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+            'https://github.com/soft-matter-lab/networkgen/',
         },
         blog: {
           showReadingTime: true,
@@ -55,7 +67,7 @@ const config: Config = {
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl:
-            'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+            'https://github.com/soft-matter-lab/networkgen/',
           // Useful options to enforce blogging best practices
           onInlineTags: 'warn',
           onInlineAuthors: 'warn',
@@ -78,18 +90,25 @@ const config: Config = {
       title: 'NetworkGen',
       logo: {
         alt: 'My Site Logo',
-        src: 'img/logo.svg',
+        src: 'img/netgenlogo.png',
       },
       items: [
         {
           type: 'docSidebar',
+          sidebarId: 'documentationSidebar',
+          position: 'left',
+          label: 'Documentation',
+        },
+        {
+          type: 'docSidebar',
           sidebarId: 'tutorialSidebar',
+          docsPluginId: 'tutorial',
           position: 'left',
           label: 'Tutorial',
         },
-        {to: '/blog', label: 'Blog', position: 'left'},
+        {to: '/about', label: 'About', position: 'left'},
         {
-          href: 'https://github.com/facebook/docusaurus',
+          href: 'https://github.com/soft-matter-lab/networkgen',
           label: 'GitHub',
           position: 'right',
         },
@@ -102,9 +121,14 @@ const config: Config = {
           title: 'Docs',
           items: [
             {
-              label: 'Tutorial',
-              to: '/docs/intro',
+              label: 'Documentation',
+              to: '/docs/overview',
             },
+            {
+              label: 'Tutorial',
+              to: '/tutorial/name',
+            },
+
           ],
         },
         {
@@ -125,20 +149,24 @@ const config: Config = {
           ],
         },
         {
-          title: 'More',
+          title: 'External Links',
           items: [
             {
-              label: 'Blog',
-              to: '/blog',
+              label: 'Vernerey Lab',
+              href: 'https://www.colorado.edu/lab/vernerey/',
+            },
+            {
+              label: 'LAMMPS',
+              href: 'https://www.lammps.org/',
             },
             {
               label: 'GitHub',
-              href: 'https://github.com/facebook/docusaurus',
+              href: 'https://github.com/soft-matter-lab/networkgen',
             },
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} My Project, Inc. Built with Docusaurus.`,
+      copyright: `Copyright © ${new Date().getFullYear()} Soft Matter Lab, University of Colorado Boulder. Built with Docusaurus.`,
     },
     prism: {
       theme: prismThemes.github,
