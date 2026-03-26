@@ -22,11 +22,13 @@ function Nvec = AssignPerBond(obj, Bonds, Atoms)
 %   Nvec  : [Nbonds x 1] Kuhn segment count per bond
 % -------------------------------------------------------------------------
 
-    if obj.perbond.kuhn.auto
-        mode = lower(obj.architecture.strand_typology.mode);
-    else
-        mode = lower(obj.perbond.kuhn.mode);
-    end
+    % if obj.perbond.kuhn.auto
+    %     mode = lower(obj.architecture.strand_typology.mode);
+    % else
+    %     mode = lower(obj.perbond.kuhn.mode);
+    % end
+
+    mode = lower(obj.perbond.kuhn.mode);
 
     switch mode
 
