@@ -92,7 +92,7 @@ properties
         'rho_max',              500 ...
     );
 
-    %%% log helper class
+    %%% networklog helper class
     log networklog
 
 end
@@ -133,7 +133,7 @@ methods
             % ---------------------------------------------------------
             % 4. Assign per/atom
             % ---------------------------------------------------------
-            Atoms = AssignPerAtom(obj, Atoms);
+            %Atoms = AssignPerAtom(obj, Atoms);
             % AssignPerAtom should read per-atom settings (if any) from obj
            
 
