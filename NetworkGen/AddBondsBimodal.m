@@ -69,7 +69,11 @@ function [Atoms, Bonds] = connect_bimodal_general(obj, Atoms)
 
     useProb    = strcmpi(bi.height_mode, 'prob');
     useManual  = strcmpi(bi.bin_window_method, 'manual');
-    useMixed   = strcmpi(bi.manual_dev_type, 'mixed');
+    % 'both' is a legacy alias for 'mixed' (use sigR for BOTH window widths).
+    % Without this, 'both' silently falls to the lam*b*sig branch and produces
+    % a type-2 window ~5x too narrow, breaking double-network bond placement.
+    useMixed   = strcmpi(bi.manual_dev_type, 'mixed') || ...
+                 strcmpi(bi.manual_dev_type, 'both');
     long_first = bi.long_first;
 
     double_network = bi.double_network_flag;
@@ -164,20 +168,29 @@ function [Atoms, Bonds] = connect_bimodal_general(obj, Atoms)
     r2_upper = r2_avg + dr2;
 
     if autoN1
+        N1old = N1;
         R1AVG = 0.5*(r1_upper-r1_lower) + r1_lower;
         N1 = R1AVG/(lam1*b);
-        bi.mean_1 = N1;
+        % Write back so AssignPerBond receives the updated value.
+        obj.architecture.strand_typology.bimodal.mean_1 = N1;
+        obj.log.print('   Auto N1: adjusted N1 from %.0f to %.0f\n', N1old, N1);
     end
 
     if autoN2
+        N2old = N2;
         R2AVG = 0.5*(r2_upper-r2_lower) + r2_lower;
         N2 = 1.4*R2AVG/(lam2*b);
-        bi.mean_2 = N2;
+        % Write back so AssignPerBond receives the updated value.
+        obj.architecture.strand_typology.bimodal.mean_2 = N2;
+        obj.log.print('   Auto N2: adjusted N2 from %.0f to %.0f\n', N2old, N2);
     end
 
     ids = Atoms(:,1);
     x   = Atoms(:,2);
     y   = Atoms(:,3);
+
+    % Live per-node adjacency set used by exclude_existing_any.
+    adj_set = cell(natom, 1);
 
     if double_network
         avg_nn_spacing = sqrt((xhi-xlo)*(yhi-ylo)/natom);
@@ -285,7 +298,7 @@ function [Atoms, Bonds] = connect_bimodal_general(obj, Atoms)
 
             in2 = (d >= r2lo) & (d <= r2hi);
             cand2 = neigh(in2);
-            cand2 = exclude_existing_any(cand2, r1, Btmp, nbond);
+            cand2 = exclude_existing_any(cand2, r1, adj_set);
 
             if ~useManual
                 C = numel(cand2);
@@ -317,6 +330,9 @@ function [Atoms, Bonds] = connect_bimodal_general(obj, Atoms)
 
             deg2(r1) = deg2(r1) + 1;
             deg2(r2) = deg2(r2) + 1;
+
+            adj_set{r1}(end+1) = r2;
+            adj_set{r2}(end+1) = r1;
 
             no_progress = 0;
         end
@@ -363,7 +379,7 @@ function [Atoms, Bonds] = connect_bimodal_general(obj, Atoms)
 
             in1 = (d >= rlo) & (d <= rhi);
             cand = neigh(in1);
-            cand = exclude_existing_any(cand, r1, Btmp, nbond);
+            cand = exclude_existing_any(cand, r1, adj_set);
 
             if ~useManual
                 C = numel(cand);
@@ -391,6 +407,9 @@ function [Atoms, Bonds] = connect_bimodal_general(obj, Atoms)
 
             deg1(r1) = deg1(r1) + 1;
             deg1(r2) = deg1(r2) + 1;
+
+            adj_set{r1}(end+1) = r2;
+            adj_set{r2}(end+1) = r1;
 
             no_progress = 0;
         end
@@ -442,7 +461,7 @@ function [Atoms, Bonds] = connect_bimodal_general(obj, Atoms)
 
             in1 = (d >= rlo) & (d <= rhi);
             cand = neigh(in1);
-            cand = exclude_existing_any(cand, r1, Btmp, nbond);
+            cand = exclude_existing_any(cand, r1, adj_set);
 
             if ~useManual
                 C = numel(cand);
@@ -472,6 +491,9 @@ function [Atoms, Bonds] = connect_bimodal_general(obj, Atoms)
             deg1(r2) = deg1(r2) + 1;
             degTot(r1) = degTot(r1) + 1;
             degTot(r2) = degTot(r2) + 1;
+
+            adj_set{r1}(end+1) = r2;
+            adj_set{r2}(end+1) = r1;
 
             no_progress = 0;
         end
@@ -542,7 +564,7 @@ function [Atoms, Bonds] = connect_bimodal_general(obj, Atoms)
 
             in2 = (d >= r2lo) & (d <= r2hi);
             cand2 = neigh(in2);
-            cand2 = exclude_existing_any(cand2, r1, Btmp, nbond);
+            cand2 = exclude_existing_any(cand2, r1, adj_set);
 
             if ~useManual
                 C = numel(cand2);
@@ -576,6 +598,9 @@ function [Atoms, Bonds] = connect_bimodal_general(obj, Atoms)
             deg2(r2) = deg2(r2) + 1;
             degTot(r1) = degTot(r1) + 1;
             degTot(r2) = degTot(r2) + 1;
+
+            adj_set{r1}(end+1) = r2;
+            adj_set{r2}(end+1) = r1;
 
             no_progress = 0;
         end
@@ -642,26 +667,20 @@ function neigh = gather_neighbors(r1, Cells, cx, cy, nx, ny, isPeriodic)
 
 end
 
-function cand = exclude_existing_any(cand, r1, Btmp, nbond)
+function cand = exclude_existing_any(cand, r1, adj_set)
+% EXCLUDE_EXISTING_ANY
+%   Remove from cand any row index already connected to r1.
+%
+%   adj_set is a natom-element cell array where adj_set{r} contains the
+%   set of row indices bonded to r (any type).  It is maintained live in
+%   the calling loop so this function is O(degree) not O(nbond).
 
-    if isempty(cand) || nbond == 0
+    if isempty(cand) || isempty(adj_set{r1})
         return;
     end
 
-    used = false(size(cand));
-
-    for k = 1:nbond
-        i = Btmp(k,2);
-        j = Btmp(k,3);
-
-        if i == r1
-            used = used | (cand == j);
-        elseif j == r1
-            used = used | (cand == i);
-        end
-    end
-
-    cand = cand(~used);
+    already = adj_set{r1};
+    cand    = cand(~ismember(cand, already));
 
 end
 
@@ -678,49 +697,53 @@ function d = minimum_image(isPeriodic, dx, dy, Lx, Ly)
 
 end
 
-function isSparse = pick_uniform_sparse_nodes(x, y, f_sparse, target_spacing)
+function isSparse = pick_uniform_sparse_nodes(x, y, f_sparse, r_spacing)
+% PICK_UNIFORM_SPARSE_NODES
+%   Select a spatially uniform random subset of nodes such that every
+%   selected node is at least r_spacing away from every other selected node.
+%
+%   The spacing constraint is HARD: if the domain cannot fit f_sparse*natom
+%   nodes at the requested separation, fewer nodes are returned.  The old
+%   code had a fallback that topped up with randomly-chosen close neighbours,
+%   which defeated the spacing guarantee needed for double-network geometry.
+%
+%   x, y       - node coordinates  (natom x 1)
+%   f_sparse   - target fraction of nodes to select  (e.g. 0.04 for alpha=5)
+%   r_spacing  - minimum centre-to-centre distance between selected nodes
 
-    natom = numel(x);
-    targetN = max(1, round(f_sparse * natom));
+    natom          = numel(x);
+    Nsparse_target = round(f_sparse * natom);
+    isSparse       = false(natom, 1);
 
-    order = randperm(natom);
-    isSparse = false(natom,1);
+    idx_all = randperm(natom);
+    picked  = [];                  % row indices of accepted nodes
 
-    selx = zeros(targetN,1);
-    sely = zeros(targetN,1);
-    nsel = 0;
+    for k = 1:natom
+        i = idx_all(k);
 
-    for kk = 1:natom
-        r = order(kk);
-
-        if nsel == 0
-            nsel = 1;
-            isSparse(r) = true;
-            selx(nsel) = x(r);
-            sely(nsel) = y(r);
-        else
-            dx = selx(1:nsel) - x(r);
-            dy = sely(1:nsel) - y(r);
-            d2 = dx.^2 + dy.^2;
-
-            if all(d2 >= target_spacing^2)
-                nsel = nsel + 1;
-                isSparse(r) = true;
-                selx(nsel) = x(r);
-                sely(nsel) = y(r);
-            end
+        if isempty(picked)
+            picked(end+1) = i;     %#ok<AGROW>
+            continue;
         end
 
-        if nsel >= targetN
+        % Accept only if far enough from every already-selected node
+        dx = x(picked) - x(i);
+        dy = y(picked) - y(i);
+        if all(sqrt(dx.^2 + dy.^2) >= r_spacing)
+            picked(end+1) = i;     %#ok<AGROW>
+        end
+
+        if numel(picked) >= Nsparse_target
             break;
         end
     end
 
-    if nsel < targetN
-        remaining = find(~isSparse);
-        remaining = remaining(randperm(numel(remaining)));
-        addN = min(targetN-nsel, numel(remaining));
-        isSparse(remaining(1:addN)) = true;
+    isSparse(picked) = true;
+
+    if numel(picked) < Nsparse_target
+        fprintf(['   [pick_uniform_sparse_nodes] Warning: placed %d / %d sparse nodes.\n' ...
+                 '   Domain may be too small or r_spacing too large for requested f_sparse.\n'], ...
+                numel(picked), Nsparse_target);
     end
 
 end

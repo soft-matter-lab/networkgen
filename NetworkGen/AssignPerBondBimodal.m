@@ -29,7 +29,7 @@ function Nvec = AssignPerBondBimodal(obj, Bonds, Atoms)
     if nbonds == 0
         return;
     end
-
+    obj.perbond.kuhn.bimodal = obj.architecture.strand_typology.bimodal; %% DELETE THIS WHEN COPYING WORKS
     bd = obj.perbond.kuhn.bimodal;
     b  = obj.domain.b;
 

@@ -7,8 +7,8 @@ net.Nreplicates = 1;
 
 %% ---- Domain ----
 net.domain.b                 = 1.6;
-net.domain.Lx                = 1000;
-net.domain.Ly                = 1000;
+net.domain.Lx                = 150;
+net.domain.Ly                = 150;
 net.domain.scale             = 1;
 net.domain.boundary          = 'fixed';
 net.domain.write_location    = './networks';
@@ -17,25 +17,42 @@ net.domain.lammps_viz_file   = 'PolyVisual';
 net.domain.smp_number        = 1;
 
 %% ---- Architecture ----
-net.architecture.geometry           = 'random';                       %'random' or 'hex_lattice'
+net.architecture.geometry           = 'random';
 net.architecture.rho_atom           = 0.0078;
 net.peratom.Max_peratom_bond        = 6;
 
 %% ---- Strand typology ----
 net.architecture.strand_typology.mode = 'bimodal';
-net.architecture.strand_typology.mono.value = 20;
+net.architecture.strand_typology.bimodal.method       = 'gaussian';
+net.architecture.strand_typology.bimodal.mean_1       = 10;
+net.architecture.strand_typology.bimodal.mean_2       = 40;
+net.architecture.strand_typology.bimodal.std_1        = 3;
+net.architecture.strand_typology.bimodal.std_2        = 3;
+net.architecture.strand_typology.bimodal.height_mode  = 'prob';
+net.architecture.strand_typology.bimodal.height_prob  = 0.5;
+net.architecture.strand_typology.bimodal.long_first   = true;
+net.architecture.strand_typology.bimodal.bin_window_method = 'manual';
+net.architecture.strand_typology.bimodal.manual_dev_type = 'mixed';
+net.architecture.strand_typology.bimodal.double_network_flag = true;
+net.architecture.strand_typology.bimodal.alpha = 2.0;
+net.architecture.strand_typology.bimodal.lam_1 = 0.2;
+net.architecture.strand_typology.bimodal.lam_2 = 0.5;
+net.architecture.strand_typology.bimodal.auto_1_flag = true;
+net.architecture.strand_typology.bimodal.auto_2_flag = true;
+net.architecture.strand_typology.bimodal.stdR_1 = 3;
+net.architecture.strand_typology.bimodal.stdR_2 = 10;
 
 %% ---- Perbond ----
-net.perbond.kuhn.auto = true;
+net.perbond.kuhn = net.architecture.strand_typology;
 
 %% ---- Flags ----
-net.flags.isave      = true;
+net.flags.isave      = false;
 net.flags.iplot      = true;
 net.flags.ilog       = true;
 net.flags.savemode   = true;
 net.flags.imanualseed = false;
 net.flags.idefect    = false;
-net.flags.ipotential = true;
+net.flags.ipotential = false;
 
 %% ---- Generate ----
 net.generateNetwork();
