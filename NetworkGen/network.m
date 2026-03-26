@@ -165,7 +165,7 @@ methods
             % ---------------------------------------------------------
             % 9. Construct local density potential
             % ---------------------------------------------------------
-            % LDpot = ConstructLDPotential(obj, Atoms, Bonds, Nvec);
+            LDpot = ConstructLDPotential(obj, Atoms, Bonds, Nvec);
 
             % ---------------------------------------------------------
             % 10. Scale domain if needed
@@ -186,7 +186,7 @@ methods
             % ---------------------------------------------------------
             % 13. Write data files
             % ---------------------------------------------------------
-            WriteDataFiles(obj, Atoms, Bonds, Nvec, LDpot, order);
+            WriteDataFiles(obj, Atoms, Bonds, Nvec, LDpot);
 
             % ---------------------------------------------------------
             % 14. Write and clear logs
