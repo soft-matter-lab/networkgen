@@ -139,7 +139,7 @@ function [Atoms] = AddAtomsRandom(obj)
 
     end
 
-    fprintf('   Placed %d atoms in %4.4f sec\n', N_atom, toc(tstart));
+    obj.log.print('   Placed %d atoms in %4.4f sec\n', N_atom, toc(tstart));
 
     if N_atom < Max_atom
         warning('Requested %d atoms, placed %d atoms.', Max_atom, N_atom);

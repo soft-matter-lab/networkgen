@@ -29,8 +29,8 @@ function Nvec = AssignPerBondMono(obj, Bonds, Atoms)
 
     Nvec(:) = Nmono;
 
-    fprintf('   Kuhn assignment mode: mono\n');
-    fprintf('   Kuhn-to-crosslinker ratio %0.4f\n', sum(Nvec)/max(natoms,1));
-    fprintf('   Average chain length %0.4f\n', sum(Nvec)/max(length(Nvec),1));
+    obj.log.print('   Kuhn assignment mode: mono\n');
+    obj.log.print('   Kuhn-to-crosslinker ratio %0.4f\n', sum(Nvec)/max(natoms,1));
+    obj.log.print('   Average chain length %0.4f\n', sum(Nvec)/max(length(Nvec),1));
 
 end

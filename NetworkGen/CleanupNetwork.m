@@ -34,7 +34,7 @@ function [Atoms, Bonds, Nvec] = CleanupNetwork(obj, Atoms, Bonds, Nvec)
     %  Guard: trivially empty input
     %% ------------------------------------------------------------------
     if isempty(Atoms) || isempty(Bonds)
-        fprintf('   [CleanupNetwork] Empty Atoms or Bonds on entry; nothing to clean.\n');
+        obj.log.print('   [CleanupNetwork] Empty Atoms or Bonds on entry; nothing to clean.\n');
         Atoms = zeros(0, max(5 + obj.peratom.Max_peratom_bond, 5));
         Bonds = zeros(0, 5);
         Nvec  = [];
@@ -58,17 +58,17 @@ function [Atoms, Bonds, Nvec] = CleanupNetwork(obj, Atoms, Bonds, Nvec)
     %  sparse adjacency matrix each iteration, to keep memory low for
     %  large networks.
     %% ------------------------------------------------------------------
-    fprintf('   [CleanupNetwork] Starting: %d atoms, %d bonds\n', natom_in, nbond_in);
+    obj.log.print('   [CleanupNetwork] Starting: %d atoms, %d bonds\n', natom_in, nbond_in);
 
     % Build a fast ID -> local row index map for the current atom set
     [Atoms, Bonds, Nvec, n_pruned_atoms, n_pruned_bonds] = ...
         iterative_degree_prune(Atoms, Bonds, Nvec, min_keep);
 
     if n_pruned_atoms > 0
-        fprintf('   [CleanupNetwork] Degree pruning removed %d atoms and %d bonds\n', ...
+        obj.log.print('   [CleanupNetwork] Degree pruning removed %d atoms and %d bonds\n', ...
             n_pruned_atoms, n_pruned_bonds);
     else
-        fprintf('   [CleanupNetwork] Degree pruning: nothing removed\n');
+        obj.log.print('   [CleanupNetwork] Degree pruning: nothing removed\n');
     end
 
     if isempty(Atoms) || isempty(Bonds)
@@ -174,11 +174,11 @@ function [Atoms, Bonds, Nvec] = CleanupNetwork(obj, Atoms, Bonds, Nvec)
             Nvec = Nvec(keep_b, :);
         end
 
-        fprintf(['   [CleanupNetwork] Removed %d atoms and %d bonds ' ...
+        obj.log.print(['   [CleanupNetwork] Removed %d atoms and %d bonds ' ...
                  'in %d small/secondary disconnected component(s)\n'], ...
             n_small_atoms, n_small_bonds, n_comp - 1);
     else
-        fprintf('   [CleanupNetwork] Single connected component, no fragments removed\n');
+        obj.log.print('   [CleanupNetwork] Single connected component, no fragments removed\n');
     end
 
     if isempty(Atoms) || isempty(Bonds)
@@ -238,7 +238,7 @@ function [Atoms, Bonds, Nvec] = CleanupNetwork(obj, Atoms, Bonds, Nvec)
     %% ------------------------------------------------------------------
     %  Summary
     %% ------------------------------------------------------------------
-    fprintf(['   [CleanupNetwork] Done.  %d atoms (-%d), %d bonds (-%d)\n'], ...
+    obj.log.print('   [CleanupNetwork] Done.  %d atoms (-%d), %d bonds (-%d)\n', ...
         size(Atoms, 1), natom_in - size(Atoms, 1), ...
         size(Bonds, 1), nbond_in - size(Bonds, 1));
 

@@ -27,7 +27,7 @@ function [Atoms, Bonds, Nvec] = AddDefects(obj, Atoms, Bonds, Nvec)
     %  0.  Early exit if defects are disabled
     %% ------------------------------------------------------------------
     if ~obj.flags.idefect
-        fprintf('   [AddDefects] Skipped (flags.idefect = false)\n');
+        obj.log.print('   [AddDefects] Skipped (flags.idefect = false)\n');
         return;
     end
 
@@ -57,11 +57,11 @@ function [Atoms, Bonds, Nvec] = AddDefects(obj, Atoms, Bonds, Nvec)
     if strcmpi(d.density_mode, 'area_frac')
         mean_void_area = pi * r_mean^2;
         n_voids = max(1, round(d.void_area_frac * domain_area / mean_void_area));
-        fprintf('   [AddDefects] area_frac mode: targeting %.1f%% coverage -> %d voids\n', ...
+        obj.log.print('   [AddDefects] area_frac mode: targeting %.1f%% coverage -> %d voids\n', ...
             d.void_area_frac * 100, n_voids);
     else
         n_voids = max(1, round(d.n_voids));
-        fprintf('   [AddDefects] count mode: %d voids requested\n', n_voids);
+        obj.log.print('   [AddDefects] count mode: %d voids requested\n', n_voids);
     end
 
     %% ------------------------------------------------------------------
@@ -170,7 +170,7 @@ function [Atoms, Bonds, Nvec] = AddDefects(obj, Atoms, Bonds, Nvec)
             cand_y = y_lo + eff_Ly * rand(n_voids, 1);
     end
 
-    fprintf('   [AddDefects] center_distribution = %s\n', d.center_distribution);
+    obj.log.print('   [AddDefects] center_distribution = %s\n', d.center_distribution);
 
     %% ------------------------------------------------------------------
     %  6.  Enforce no-overlap / bridge constraint (if requested)
@@ -242,7 +242,7 @@ function [Atoms, Bonds, Nvec] = AddDefects(obj, Atoms, Bonds, Nvec)
         centers   = centers(1:placed, :);
     end
 
-    fprintf('   [AddDefects] Placed %d voids  (void_overlap=%d)\n', n_voids, vo);
+    obj.log.print('   [AddDefects] Placed %d voids  (void_overlap=%d)\n', n_voids, vo);
 
     %% ------------------------------------------------------------------
     %  7.  Generate per-void boundary roughness (polar Fourier perturbation)
@@ -319,13 +319,13 @@ function [Atoms, Bonds, Nvec] = AddDefects(obj, Atoms, Bonds, Nvec)
     % Final removal mask
     if do_sparse
         remove_mask = in_void | ~near_boundary;
-        fprintf('   [AddDefects] sparse_network mode  (wall_thickness=%.2g)\n', wall_t);
+        obj.log.print('   [AddDefects] sparse_network mode  (wall_thickness=%.2g)\n', wall_t);
     else
         remove_mask = in_void;
     end
 
     n_removed = sum(remove_mask);
-    fprintf('   [AddDefects] Marking %d / %d atoms for removal (%.1f%%)\n', ...
+    obj.log.print('   [AddDefects] Marking %d / %d atoms for removal (%.1f%%)\n', ...
         n_removed, natom, 100.0 * n_removed / max(natom, 1));
 
     %% ------------------------------------------------------------------
@@ -349,7 +349,7 @@ function [Atoms, Bonds, Nvec] = AddDefects(obj, Atoms, Bonds, Nvec)
     if isempty(Bonds)
         Bonds = zeros(0, size(Bonds, 2));
         Nvec  = [];
-        fprintf('   [AddDefects] No bonds to filter\n');
+        obj.log.print('   [AddDefects] No bonds to filter\n');
         return;
     end
 
@@ -359,7 +359,7 @@ function [Atoms, Bonds, Nvec] = AddDefects(obj, Atoms, Bonds, Nvec)
 
     n_bonds_rm = sum(~keep);
     Bonds = Bonds(keep, :);
-    fprintf('   [AddDefects] Removed %d / %d bonds incident to void atoms\n', ...
+    obj.log.print('   [AddDefects] Removed %d / %d bonds incident to void atoms\n', ...
         n_bonds_rm, n_bonds_rm + size(Bonds, 1));
 
     %% ------------------------------------------------------------------
@@ -369,7 +369,7 @@ function [Atoms, Bonds, Nvec] = AddDefects(obj, Atoms, Bonds, Nvec)
         Nvec = Nvec(keep, :);
     end
 
-    fprintf(['   [AddDefects] Done. ' ...
+    obj.log.print(['   [AddDefects] Done. ' ...
              '%d atoms remain (-%d), %d bonds remain (-%d).\n'], ...
         size(Atoms, 1),  n_removed, ...
         size(Bonds, 1),  n_bonds_rm);

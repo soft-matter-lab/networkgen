@@ -16,7 +16,7 @@ function [] = localPrepareReplicate(obj, ii, Nreplicates)
 %   (writes replicate-specific runtime info into obj.log)
 % -------------------------------------------------------------------------
 
-    obj.log.print('Generating network replicate %d of %d...\n', ii, Nreplicates);
+    fprintf('Generating network replicate %d of %d...\n', ii, Nreplicates);
 
     %% ---------------------- 1. Choose replicate seed --------------------
     if obj.flags.imanualseed

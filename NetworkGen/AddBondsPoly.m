@@ -57,7 +57,7 @@ function [AtomsOut, BondsOut] = connect_general_poly(obj, Atoms)
     else
         spacing_multiplier = obj.architecture.spacing_multiplier;
     end
-    
+
     Rcut = a * spacing_multiplier;
     Rcut2 = Rcut * Rcut;
 
@@ -155,7 +155,7 @@ function [AtomsOut, BondsOut] = connect_general_poly(obj, Atoms)
 
         no_progress = 0;
     end
-    fprintf('   Poly/%s: placed %d bonds in %4.4f sec\n', ...
+    obj.log.print('   Poly/%s: placed %d bonds in %4.4f sec\n', ...
         lower(obj.architecture.geometry), nbond, toc);
 
     BondsRows = BondsRows(1:nbond,:);
@@ -294,7 +294,7 @@ function [AtomsOut, BondsOut] = finalize_network(Atoms, BondsRows, ids, x, y, ..
     if isempty(Atoms) || isempty(BondsRows)
         AtomsOut = zeros(0,5);
         BondsOut = zeros(0,5);
-        fprintf('   Pruned all atoms/bonds\n');
+        obj.log.print('   Pruned all atoms/bonds\n');
         return;
     end
 

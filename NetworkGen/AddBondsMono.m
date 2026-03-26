@@ -158,7 +158,7 @@ function [AtomsOut, BondsOut] = connect_random_mono(obj, Atoms)
 
         no_progress = 0;
     end
-    fprintf('   Mono/random: placed %d bonds in %4.4f sec\n', nbond, toc);
+    obj.log.print('   Mono/random: placed %d bonds in %4.4f sec\n', nbond, toc);
 
     BondsRows = BondsRows(1:nbond,:);
 
@@ -289,7 +289,7 @@ function [Atoms, Bonds] = connect_lattice_mono(obj, Atoms, LatticeData)
         Atoms(jj,5 + Atoms(jj,5)) = ii;
     end
 
-    fprintf('   Mono/lattice: placed %d bonds\n', size(Bonds,1));
+    obj.log.print('   Mono/lattice: placed %d bonds\n', size(Bonds,1));
 
 end
 
@@ -422,7 +422,7 @@ function [AtomsOut, BondsOut] = finalize_network(Atoms, BondsRows, ids, x, y, ..
     if isempty(Atoms) || isempty(BondsRows)
         AtomsOut = zeros(0,5);
         BondsOut = zeros(0,5);
-        fprintf('   Pruned all atoms/bonds\n');
+        obj.log.print('   Pruned all atoms/bonds\n');
         return;
     end
 

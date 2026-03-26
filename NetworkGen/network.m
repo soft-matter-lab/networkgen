@@ -191,11 +191,12 @@ methods
             % ---------------------------------------------------------
             % 14. Write and clear logs
             % ---------------------------------------------------------
-            obj.log.recordNetworkStats(Atoms, Bonds, Nvec, obj_network, LDpot, order);
+            outdir = obj.domain.write_location;
+            obj.log.recordNetworkStats(Atoms, Bonds, Nvec, obj, LDpot, order);
             % Collects statistics across arrays and stores in log object for this replicate
             
-            obj.log.writeLogs( fullfile(dir,'console.log'), ...
-                               fullfile(dir,'network.log') );
+            obj.log.writeLogs( fullfile(outdir, obj.log.console_log_file), ...
+                   fullfile(outdir, obj.log.network_log_file) );
             obj.log.clear();
         end
 
