@@ -1,0 +1,466 @@
+import React, { useState, useCallback } from 'react';
+import styles from './styles.module.css';
+
+const SECTION_COLORS = {
+  domain:       { accent: '#378ADD', bg: '#E6F1FB' },
+  architecture: { accent: '#1D9E75', bg: '#E1F5EE' },
+  typology:     { accent: '#7F77DD', bg: '#EEEDFE' },
+  perbond:      { accent: '#D85A30', bg: '#FAECE7' },
+  defect:       { accent: '#BA7517', bg: '#FAEEDA' },
+  multitype:    { accent: '#D4537E', bg: '#FBEAF0' },
+  potential:    { accent: '#3B6D11', bg: '#EAF3DE' },
+  flags:        { accent: '#5F5E5A', bg: '#F1EFE8' },
+};
+
+const DEFAULT = {
+  b: 1.6, Lx: 10, Ly: 10, boundary: 'fixed', seed: 12345,
+  write_location: './networks', lammps_data_file: 'PolyNetwork',
+  lammps_viz_file: 'PolyVisual', smp_number: 1, scale: 1,
+
+  geometry: 'random', rho_atom: 0.0078, max_peratom_bond: 6,
+  lattice_spacing: 6, spacing_multiplier_mode: 'auto',
+  spacing_multiplier: 1, lattice_disorder_level: 0,
+  lattice_disorder_maxfrac: 0.4, lattice_topo_disorder: false,
+  lattice_max_del_per_node: 1, lattice_min_degree_keep: 5,
+
+  typology_mode: 'mono',
+  mono_value: 20,
+  poly_method: 'pmf', poly_pmf_mean: 40, poly_pmf_min: 5,
+  poly_pmf_max: 120, poly_rounding: 'round', poly_align: 'none',
+  bimodal_method: 'gaussian', bimodal_mean1: 10, bimodal_mean2: 40,
+  bimodal_std1: 2, bimodal_std2: 5, bimodal_height_mode: 'prob',
+  bimodal_height_prob: 0.5, bimodal_long_first: false,
+
+  kuhn_auto: true, kuhn_mode: 'mono', kuhn_mono_value: 20,
+
+  idefect: false, defect_density_mode: 'count', defect_n_voids: 5,
+  defect_void_area_frac: 0.1, defect_size_dist: 'gaussian',
+  defect_radius_mean: 12, defect_radius_std: 4,
+  defect_radius_min: 2, defect_radius_max: 30,
+  defect_shape_roughness: 0.3, defect_shape_n_modes: 2,
+  defect_void_overlap: false, defect_center_dist: 'random',
+  defect_n_cluster_parents: 2, defect_cluster_spread: 10,
+  defect_margin_frac: 0.15, defect_prune_isolated: true,
+  defect_sparse_network: false, defect_wall_thickness: 18,
+  defect_clamp_thickness: 0.12, defect_bridge_width: 1,
+
+  use_multitype: false, natom_type: 1, nbond_type: 1,
+  atype_mode: 'frac', btype_mode: 'frac',
+
+  ipotential: false, pot_k_LD: 0.414, pot_N_rho: 100000,
+  pot_rho_min: 0.0, pot_rho_max: 500,
+
+  isave: true, iplot: true, ilog: true,
+  savemode: true, imanualseed: false,
+  Nreplicates: 1,
+};
+
+function Row({ label, hint, children }) {
+  return (
+    <div className={styles.row}>
+      <label className={styles.rowLabel}>
+        {label}
+        {hint && <span className={styles.rowHint}>{hint}</span>}
+      </label>
+      <div className={styles.rowInput}>{children}</div>
+    </div>
+  );
+}
+
+function Section({ id, title, children, defaultOpen = false }) {
+  const [open, setOpen] = useState(defaultOpen);
+  const col = SECTION_COLORS[id] || SECTION_COLORS.flags;
+  return (
+    <div className={styles.section} style={{ borderLeftColor: col.accent }}>
+      <button
+        className={styles.sectionHead}
+        style={{ background: col.bg + '66' }}
+        onClick={() => setOpen(o => !o)}
+      >
+        <span className={styles.sectionDot} style={{ background: col.accent }} />
+        <span className={styles.sectionTitle}>{title}</span>
+        <span className={styles.sectionToggle}>{open ? '▲' : '▼'}</span>
+      </button>
+      {open && <div className={styles.sectionBody}>{children}</div>}
+    </div>
+  );
+}
+
+function Sub({ title, children }) {
+  return (
+    <div className={styles.sub}>
+      <div className={styles.subLabel}>{title}</div>
+      {children}
+    </div>
+  );
+}
+
+export default function ConfigBuilder() {
+  const [cfg, setCfg] = useState(DEFAULT);
+  const [copied, setCopied] = useState(false);
+
+  const set = useCallback((key, val) => {
+    setCfg(c => ({ ...c, [key]: val }));
+  }, []);
+
+  const sel = (key, opts) => (
+    <select value={cfg[key]} onChange={e => set(key, e.target.value)}>
+      {opts.map(([v, l]) => <option key={v} value={v}>{l ?? v}</option>)}
+    </select>
+  );
+
+  const num = (key, min?, max?, step = 1) => (
+    <input type="number" value={cfg[key]}
+      min={min} max={max} step={step}
+      onChange={e => set(key, parseFloat(e.target.value) || 0)} />
+  );
+
+  const txt = (key) => (
+    <input type="text" value={cfg[key]}
+      onChange={e => set(key, e.target.value)} />
+  );
+
+  const chk = (key) => (
+    <input type="checkbox" checked={cfg[key]}
+      onChange={e => set(key, e.target.checked)} />
+  );
+
+  const slide = (key, min, max, step = 0.05) => (
+    <div style={{ display: 'flex', gap: 8, alignItems: 'center', flex: 1 }}>
+      <input type="range" min={min} max={max} step={step} value={cfg[key]}
+        onChange={e => set(key, parseFloat(e.target.value))}
+        style={{ flex: 1 }} />
+      <span className={styles.slideVal}>{Number(cfg[key]).toFixed(step < 1 ? 2 : 0)}</span>
+    </div>
+  );
+
+  function generateScript() {
+    const c = cfg;
+    const t = c.typology_mode;
+    const lines: string[] = [];
+
+    lines.push(`%% NetworkGen configuration script`);
+    lines.push(`%% Generated by the NetworkGen config builder`);
+    lines.push(`%% https://soft-matter-lab.github.io/networkgen`);
+    lines.push(``);
+    lines.push(`net = network();`);
+    lines.push(`net.Nreplicates = ${c.Nreplicates};`);
+    lines.push(``);
+    lines.push(`%% ---- Domain ----`);
+    lines.push(`net.domain.b                 = ${c.b};`);
+    lines.push(`net.domain.Lx                = ${c.Lx};`);
+    lines.push(`net.domain.Ly                = ${c.Ly};`);
+    lines.push(`net.domain.scale             = ${c.scale};`);
+    lines.push(`net.domain.boundary          = '${c.boundary}';`);
+    if (c.imanualseed) lines.push(`net.domain.seed              = ${c.seed};`);
+    lines.push(`net.domain.write_location    = '${c.write_location}';`);
+    lines.push(`net.domain.lammps_data_file  = '${c.lammps_data_file}';`);
+    lines.push(`net.domain.lammps_viz_file   = '${c.lammps_viz_file}';`);
+    lines.push(`net.domain.smp_number        = ${c.smp_number};`);
+    lines.push(``);
+    lines.push(`%% ---- Architecture ----`);
+    lines.push(`net.architecture.geometry           = '${c.geometry}';`);
+    lines.push(`net.architecture.rho_atom           = ${c.rho_atom};`);
+    lines.push(`net.peratom.Max_peratom_bond        = ${c.max_peratom_bond};`);
+    if (c.geometry === 'hex_lattice') {
+      lines.push(`net.architecture.lattice_spacing            = ${c.lattice_spacing};`);
+      lines.push(`net.architecture.spacing_multiplier_mode    = '${c.spacing_multiplier_mode}';`);
+      if (c.spacing_multiplier_mode === 'manual')
+        lines.push(`net.architecture.spacing_multiplier         = ${c.spacing_multiplier};`);
+      lines.push(`net.architecture.lattice_disorder_level     = ${c.lattice_disorder_level};`);
+      lines.push(`net.architecture.lattice_disorder_maxfrac   = ${c.lattice_disorder_maxfrac};`);
+      lines.push(`net.architecture.lattice_max_del_per_node   = ${c.lattice_max_del_per_node};`);
+      lines.push(`net.architecture.lattice_min_degree_keep    = ${c.lattice_min_degree_keep};`);
+    }
+    lines.push(``);
+    lines.push(`%% ---- Strand typology ----`);
+    lines.push(`net.architecture.strand_typology.mode = '${t}';`);
+    if (t === 'mono') {
+      lines.push(`net.architecture.strand_typology.mono.value = ${c.mono_value};`);
+    } else if (t === 'polydisperse') {
+      lines.push(`net.architecture.strand_typology.poly.method   = '${c.poly_method}';`);
+      if (c.poly_method === 'pmf') {
+        lines.push(`net.architecture.strand_typology.poly.pmf_mean = ${c.poly_pmf_mean};`);
+        lines.push(`net.architecture.strand_typology.poly.pmf_min  = ${c.poly_pmf_min};`);
+        lines.push(`net.architecture.strand_typology.poly.pmf_max  = ${c.poly_pmf_max};`);
+      }
+      lines.push(`net.architecture.strand_typology.poly.rounding       = '${c.poly_rounding}';`);
+      lines.push(`net.architecture.strand_typology.poly.align_to_length = '${c.poly_align}';`);
+    } else if (t === 'bimodal') {
+      lines.push(`net.architecture.strand_typology.bimodal.method       = '${c.bimodal_method}';`);
+      lines.push(`net.architecture.strand_typology.bimodal.mean_1       = ${c.bimodal_mean1};`);
+      lines.push(`net.architecture.strand_typology.bimodal.mean_2       = ${c.bimodal_mean2};`);
+      if (c.bimodal_method !== 'single') {
+        lines.push(`net.architecture.strand_typology.bimodal.std_1        = ${c.bimodal_std1};`);
+        lines.push(`net.architecture.strand_typology.bimodal.std_2        = ${c.bimodal_std2};`);
+      }
+      lines.push(`net.architecture.strand_typology.bimodal.height_mode  = '${c.bimodal_height_mode}';`);
+      if (c.bimodal_height_mode === 'prob')
+        lines.push(`net.architecture.strand_typology.bimodal.height_prob  = ${c.bimodal_height_prob};`);
+      lines.push(`net.architecture.strand_typology.bimodal.long_first   = ${c.bimodal_long_first};`);
+    }
+    lines.push(``);
+    lines.push(`%% ---- Perbond ----`);
+    lines.push(`net.perbond.kuhn.auto = ${c.kuhn_auto};`);
+    if (!c.kuhn_auto) {
+      lines.push(`net.perbond.kuhn.mode = '${c.kuhn_mode}';`);
+      if (c.kuhn_mode === 'mono')
+        lines.push(`net.perbond.kuhn.mono.value = ${c.kuhn_mono_value};`);
+    }
+    if (c.idefect) {
+      lines.push(``);
+      lines.push(`%% ---- Defects ----`);
+      lines.push(`net.defect.density_mode       = '${c.defect_density_mode}';`);
+      if (c.defect_density_mode === 'count')
+        lines.push(`net.defect.n_voids            = ${c.defect_n_voids};`);
+      else
+        lines.push(`net.defect.void_area_frac     = ${c.defect_void_area_frac};`);
+      lines.push(`net.defect.size_dist          = '${c.defect_size_dist}';`);
+      lines.push(`net.defect.radius_mean        = ${c.defect_radius_mean};`);
+      if (c.defect_size_dist !== 'fixed') {
+        lines.push(`net.defect.radius_std         = ${c.defect_radius_std};`);
+        lines.push(`net.defect.radius_min         = ${c.defect_radius_min};`);
+        lines.push(`net.defect.radius_max         = ${c.defect_radius_max};`);
+      }
+      lines.push(`net.defect.shape_roughness    = ${c.defect_shape_roughness};`);
+      lines.push(`net.defect.shape_n_modes      = ${c.defect_shape_n_modes};`);
+      lines.push(`net.defect.void_overlap       = ${c.defect_void_overlap};`);
+      lines.push(`net.defect.center_distribution = '${c.defect_center_dist}';`);
+      if (c.defect_center_dist === 'clustered') {
+        lines.push(`net.defect.n_cluster_parents  = ${c.defect_n_cluster_parents};`);
+        lines.push(`net.defect.cluster_spread     = ${c.defect_cluster_spread};`);
+      }
+      lines.push(`net.defect.margin_frac        = ${c.defect_margin_frac};`);
+      lines.push(`net.defect.prune_isolated     = ${c.defect_prune_isolated};`);
+      lines.push(`net.defect.sparse_network     = ${c.defect_sparse_network};`);
+      lines.push(`net.defect.wall_thickness     = ${c.defect_wall_thickness};`);
+      lines.push(`net.defect.clamp_thickness    = ${c.defect_clamp_thickness};`);
+      lines.push(`net.defect.bridge_width       = ${c.defect_bridge_width};`);
+    }
+    if (c.use_multitype) {
+      lines.push(``);
+      lines.push(`%% ---- Multi-type ----`);
+      lines.push(`net.architecture.types.natom_type  = ${c.natom_type};`);
+      lines.push(`net.architecture.types.nbond_type  = ${c.nbond_type};`);
+      lines.push(`net.architecture.types.atype_mode  = '${c.atype_mode}';`);
+      lines.push(`net.architecture.types.btype_mode  = '${c.btype_mode}';`);
+      lines.push(`net.architecture.types.connectivity = [];  %% add exclusion rules if needed`);
+    }
+    if (c.ipotential) {
+      lines.push(``);
+      lines.push(`%% ---- Potential (pair local/density) ----`);
+      lines.push(`net.pot.k_LD    = ${c.pot_k_LD};`);
+      lines.push(`net.pot.N_rho   = ${c.pot_N_rho};`);
+      lines.push(`net.pot.rho_min = ${c.pot_rho_min};`);
+      lines.push(`net.pot.rho_max = ${c.pot_rho_max};`);
+    }
+    lines.push(``);
+    lines.push(`%% ---- Flags ----`);
+    lines.push(`net.flags.isave      = ${c.isave};`);
+    lines.push(`net.flags.iplot      = ${c.iplot};`);
+    lines.push(`net.flags.ilog       = ${c.ilog};`);
+    lines.push(`net.flags.savemode   = ${c.savemode};`);
+    lines.push(`net.flags.imanualseed = ${c.imanualseed};`);
+    lines.push(`net.flags.idefect    = ${c.idefect};`);
+    lines.push(`net.flags.ipotential = ${c.ipotential};`);
+    lines.push(``);
+    lines.push(`%% ---- Generate ----`);
+    lines.push(`net.generateNetwork();`);
+
+    return lines.join('\n');
+  }
+
+  function handleCopy() {
+    navigator.clipboard.writeText(generateScript());
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+
+  function handleDownload() {
+    const blob = new Blob([generateScript()], { type: 'text/plain' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'networkgen_config.m';
+    a.click();
+  }
+
+  const t = cfg.typology_mode;
+
+  return (
+    <div className={styles.outer}>
+      <div className={styles.formCol}>
+
+        <Section id="domain" title="Domain" defaultOpen>
+          <Row label="b" hint="lengthscale">{num('b', 0.1, null, 0.1)}</Row>
+          <Row label="Lx" hint="units of b">{num('Lx', 1)}</Row>
+          <Row label="Ly" hint="units of b">{num('Ly', 1)}</Row>
+          <Row label="Scale">{num('scale', 0.1, null, 0.1)}</Row>
+          <Row label="Boundary">{sel('boundary', [['fixed'], ['periodic']])}</Row>
+          <Row label="Replicates">{num('Nreplicates', 1, null, 1)}</Row>
+          <Row label="Manual seed">
+            {chk('imanualseed')}
+          </Row>
+          {cfg.imanualseed && <Row label="Seed">{num('seed', 1)}</Row>}
+          <Row label="Output folder">{txt('write_location')}</Row>
+          <Row label="Data file prefix">{txt('lammps_data_file')}</Row>
+          <Row label="Viz file prefix">{txt('lammps_viz_file')}</Row>
+          <Row label="Sample number">{num('smp_number', 1)}</Row>
+        </Section>
+
+        <Section id="architecture" title="Architecture">
+          <Row label="Geometry">{sel('geometry', [['random'], ['hex_lattice', 'hex lattice']])}</Row>
+          <Row label="rho_atom" hint="atoms/unit area">{num('rho_atom', 0.0001, null, 0.0001)}</Row>
+          <Row label="Max bonds/atom">{num('max_peratom_bond', 3, null, 1)}</Row>
+          {cfg.geometry === 'hex_lattice' && (
+            <Sub title="Lattice settings">
+              <Row label="Lattice spacing">{num('lattice_spacing', 1, null, 0.5)}</Row>
+              <Row label="Spacing mode">{sel('spacing_multiplier_mode', [['auto'], ['manual']])}</Row>
+              {cfg.spacing_multiplier_mode === 'manual' && (
+                <Row label="Spacing multiplier">{num('spacing_multiplier', 0, null, 0.1)}</Row>
+              )}
+              <Row label="Disorder level">{slide('lattice_disorder_level', 0, 1, 0.05)}</Row>
+              <Row label="Disorder maxfrac">{slide('lattice_disorder_maxfrac', 0, 1, 0.05)}</Row>
+              <Row label="Max del/node">{num('lattice_max_del_per_node', 0, null, 1)}</Row>
+              <Row label="Min degree keep">{num('lattice_min_degree_keep', 3, null, 1)}</Row>
+            </Sub>
+          )}
+        </Section>
+
+        <Section id="typology" title="Strand typology">
+          <Row label="Mode">{sel('typology_mode', [['mono'], ['polydisperse'], ['bimodal']])}</Row>
+          {t === 'mono' && (
+            <Sub title="Mono">
+              <Row label="Kuhn value">{num('mono_value', 1)}</Row>
+            </Sub>
+          )}
+          {t === 'polydisperse' && (
+            <Sub title="Polydisperse">
+              <Row label="Method">{sel('poly_method', [['pmf'], ['range'], ['geom']])}</Row>
+              {cfg.poly_method === 'pmf' && <>
+                <Row label="PMF mean">{num('poly_pmf_mean', 1)}</Row>
+                <Row label="PMF min">{num('poly_pmf_min', 1)}</Row>
+                <Row label="PMF max">{num('poly_pmf_max', 1)}</Row>
+              </>}
+              <Row label="Rounding">{sel('poly_rounding', [['round'], ['ceil'], ['floor']])}</Row>
+              <Row label="Align to length">{sel('poly_align', [['none'], ['ascend']])}</Row>
+            </Sub>
+          )}
+          {t === 'bimodal' && (
+            <Sub title="Bimodal">
+              <Row label="Method">{sel('bimodal_method', [['gaussian'], ['geom'], ['single', 'single (fixed mean)']])}</Row>
+              <Row label="Mean 1">{num('bimodal_mean1', 1)}</Row>
+              <Row label="Mean 2">{num('bimodal_mean2', 1)}</Row>
+              {cfg.bimodal_method !== 'single' && <>
+                <Row label="Std 1">{num('bimodal_std1', 0, null, 0.5)}</Row>
+                <Row label="Std 2">{num('bimodal_std2', 0, null, 0.5)}</Row>
+              </>}
+              <Row label="Height mode">{sel('bimodal_height_mode', [['prob'], ['fixed']])}</Row>
+              {cfg.bimodal_height_mode === 'prob'
+                ? <Row label="Fraction (mode 1)">{slide('bimodal_height_prob', 0.05, 0.95, 0.05)}</Row>
+                : <Row label="Count (mode 1)">{num('bimodal_height_prob', 1)}</Row>
+              }
+              <Row label="Long first">{chk('bimodal_long_first')}</Row>
+            </Sub>
+          )}
+        </Section>
+
+        <Section id="perbond" title="Perbond">
+          <Row label="Kuhn auto" hint="copies typology">{chk('kuhn_auto')}</Row>
+          {!cfg.kuhn_auto && (
+            <Sub title="Kuhn manual distribution">
+              <Row label="Mode">{sel('kuhn_mode', [['mono'], ['polydisperse'], ['bimodal']])}</Row>
+              {cfg.kuhn_mode === 'mono' && (
+                <Row label="Kuhn value">{num('kuhn_mono_value', 1)}</Row>
+              )}
+              <div className={styles.note}>Configure full kuhn distribution settings in the generated script.</div>
+            </Sub>
+          )}
+        </Section>
+
+        <Section id="defect" title="Defects">
+          <Row label="Enable defects">{chk('idefect')}</Row>
+          {cfg.idefect && (<>
+            <Row label="Density mode">{sel('defect_density_mode', [['count'], ['area_frac', 'area fraction']])}</Row>
+            {cfg.defect_density_mode === 'count'
+              ? <Row label="N voids">{num('defect_n_voids', 0)}</Row>
+              : <Row label="Void area frac">{num('defect_void_area_frac', 0, 1, 0.01)}</Row>
+            }
+            <Row label="Size distribution">{sel('defect_size_dist', [['gaussian'], ['fixed'], ['exponential']])}</Row>
+            <Row label="Radius mean">{num('defect_radius_mean', 0, null, 0.5)}</Row>
+            {cfg.defect_size_dist !== 'fixed' && <>
+              <Row label="Radius std">{num('defect_radius_std', 0, null, 0.5)}</Row>
+              <Row label="Radius min">{num('defect_radius_min', 0, null, 0.5)}</Row>
+              <Row label="Radius max">{num('defect_radius_max', 0, null, 0.5)}</Row>
+            </>}
+            <Sub title="Shape">
+              <Row label="Roughness">{slide('defect_shape_roughness', 0, 1, 0.05)}</Row>
+              <Row label="N modes">{num('defect_shape_n_modes', 1)}</Row>
+              <Row label="Void overlap">{chk('defect_void_overlap')}</Row>
+            </Sub>
+            <Sub title="Placement">
+              <Row label="Center distribution">{sel('defect_center_dist', [['random'], ['uniform'], ['clustered']])}</Row>
+              {cfg.defect_center_dist === 'clustered' && <>
+                <Row label="N cluster parents">{num('defect_n_cluster_parents', 1)}</Row>
+                <Row label="Cluster spread">{num('defect_cluster_spread', 0, null, 0.5)}</Row>
+              </>}
+              <Row label="Margin frac">{num('defect_margin_frac', 0, 0.5, 0.01)}</Row>
+              <Row label="Bridge width">{num('defect_bridge_width', 0, null, 0.5)}</Row>
+            </Sub>
+            <Sub title="Cleanup">
+              <Row label="Prune isolated">{chk('defect_prune_isolated')}</Row>
+              <Row label="Sparse network">{chk('defect_sparse_network')}</Row>
+              <Row label="Wall thickness">{num('defect_wall_thickness', 0, null, 0.5)}</Row>
+              <Row label="Clamp thickness">{num('defect_clamp_thickness', 0, null, 0.01)}</Row>
+            </Sub>
+          </>)}
+        </Section>
+
+        <Section id="multitype" title="Multi-type">
+          <Row label="Enable multi-type">{chk('use_multitype')}</Row>
+          {cfg.use_multitype && (<>
+            <Row label="N atom types">{num('natom_type', 1)}</Row>
+            <Row label="N bond types">{num('nbond_type', 1)}</Row>
+            <Row label="Atom type mode">{sel('atype_mode', [['frac', 'fraction'], ['fixed', 'fixed count']])}</Row>
+            <Row label="Bond type mode">{sel('btype_mode', [['frac', 'fraction'], ['fixed', 'fixed count']])}</Row>
+            <div className={styles.note}>
+              Connectivity exclusion rules and type fraction arrays must be set manually in the generated script.
+            </div>
+          </>)}
+        </Section>
+
+        <Section id="potential" title="Potential">
+          <Row label="Enable potential">{chk('ipotential')}</Row>
+          {cfg.ipotential && (<>
+            <div className={styles.note}>Generates lookup table for LAMMPS <code>pair_style local/density</code> (cohesion). Equilibrium separation for <code>pair_style bpm/spring</code> is written to the log file.</div>
+            <Row label="k_LD">{num('pot_k_LD', 0, null, 0.001)}</Row>
+            <Row label="N_rho" hint="table resolution">{num('pot_N_rho', 100, null, 1000)}</Row>
+            <Row label="rho_min">{num('pot_rho_min', 0, null, 0.01)}</Row>
+            <Row label="rho_max">{num('pot_rho_max', 0, null, 1)}</Row>
+          </>)}
+        </Section>
+
+        <Section id="flags" title="Flags & output">
+          <Row label="Save files">{chk('isave')}</Row>
+          <Row label="Plot">{chk('iplot')}</Row>
+          <Row label="Write log">{chk('ilog')}</Row>
+          <Row label="Auto-name files">{chk('savemode')}</Row>
+        </Section>
+
+      </div>
+
+      <div className={styles.codeCol}>
+        <div className={styles.codeWrap}>
+          <div className={styles.codeHead}>
+            <span className={styles.codeTitle}>generated script</span>
+            <div className={styles.codeActions}>
+              <button onClick={handleCopy}>{copied ? 'Copied!' : 'Copy'}</button>
+              <button onClick={handleDownload}>Download .m</button>
+            </div>
+          </div>
+          <pre className={styles.code}>{generateScript()}</pre>
+        </div>
+      </div>
+
+    </div>
+  );
+}

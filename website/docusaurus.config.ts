@@ -107,6 +107,7 @@ const config: Config = {
           label: 'Tutorial',
         },
         {to: '/about', label: 'About', position: 'left'},
+        { to: '/config-builder', label: 'Config Builder (experimental)', position: 'left' },
         {
           href: 'https://github.com/soft-matter-lab/networkgen',
           label: 'GitHub',

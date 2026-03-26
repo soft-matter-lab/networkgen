@@ -1,0 +1,18 @@
+---
+title: Config Builder (experimental)
+description: Interactively configure a NetworkGen script and download the generated .m file
+---
+
+import ConfigBuilder from '@site/src/components/ConfigBuilder';
+
+# Config builder <span style={{fontSize:'0.65em', verticalAlign:'middle', background:'#FAEEDA', color:'#854F0B', borderRadius:'4px', padding:'2px 8px', marginLeft:'8px', fontWeight:500}}>experimental</span>
+
+Configure your network interactively. Every field updates the generated MATLAB script in real time. When ready, copy or download the `.m` file and run it in MATLAB with NetworkGen on your path.
+
+Note that this only creates the .m script. Ensure NetworkGen is also installed. See the [Installation guide](/docs/install) for full setup instructions.
+
+:::note
+This tool generates a starter script. For advanced settings — connectivity exclusion rules, multi-type fraction arrays, bimodal prestretch control — edit the script directly after downloading. See the [full settings reference](/docs/full-reference) for all available options.
+:::
+
+<ConfigBuilder />
