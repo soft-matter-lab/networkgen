@@ -170,18 +170,18 @@ methods
             % ---------------------------------------------------------
             % 10. Scale domain if needed
             % ---------------------------------------------------------
-            % [Atoms, Bonds] = ScaleDomain(obj, Atoms, Bonds);
+            [Atoms, Bonds] = ScaleDomain(obj, Atoms, Bonds);
             
             % ---------------------------------------------------------
             % 11. Show visualization and statistics
             % ---------------------------------------------------------
-            % VisualizeNetwork(obj, Atoms, Bonds, Nvec);
+            VisualizeNetwork(obj, Atoms, Bonds, Nvec);
             % VisualizeNetwork should check obj.flags.iplot internally
 
             % ---------------------------------------------------------
             % 12. Computes
             % ---------------------------------------------------------
-            % order = ComputeOrder(obj, Atoms, Bonds);
+            order = ComputeOrder(obj, Atoms, Bonds);
 
             % ---------------------------------------------------------
             % 13. Write data files
