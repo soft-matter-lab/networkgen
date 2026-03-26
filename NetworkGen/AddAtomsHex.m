@@ -76,7 +76,7 @@ function [Atoms, LatticeData] = AddAtomsHex(obj)
 
     % Keep old lattice atom layout for compatibility
     % [id x y z type isFixed]
-    Atoms = zeros(nat, 6);
+    Atoms = zeros(nat, 10);
     Atoms(:,1) = (1:nat).';
     Atoms(:,2) = x_all;
     Atoms(:,3) = y_all;
