@@ -160,7 +160,7 @@ function [AtomsOut, BondsOut] = connect_general_poly(obj, Atoms)
 
     BondsRows = BondsRows(1:nbond,:);
 
-    [AtomsOut, BondsOut] = finalize_network(Atoms, BondsRows, ids, x, y, ...
+    [AtomsOut, BondsOut] = finalize_network(obj, Atoms, BondsRows, ids, x, y, ...
         Max_peratom_bond, min_keep, isPeriodic, Lx, Ly, 1);
 
 end
@@ -232,7 +232,7 @@ function d = minimum_image(isPeriodic, dx, dy, Lx, Ly)
 
 end
 
-function [AtomsOut, BondsOut] = finalize_network(Atoms, BondsRows, ids, x, y, ...
+function [AtomsOut, BondsOut] = finalize_network(obj, Atoms, BondsRows, ids, x, y, ...
     Max_peratom_bond, min_keep, isPeriodic, Lx, Ly, bondType)
 
     natom = size(Atoms,1);

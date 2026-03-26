@@ -11,3 +11,4 @@ NetworkGen/networks/bond.table
 NetworkGen/networks/mytab.localdensity.table
 NetworkGen/networks/PolyNetwork_nano_200x200.dat
 NetworkGen/AddBondsPoly.asv
+NetworkGen/example_executeClass.asv

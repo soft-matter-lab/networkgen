@@ -54,7 +54,7 @@ properties
     %%% Per/atom
     peratom = struct(...
         'Max_peratom_bond',[], ...
-        'min_degree_keep',[] ...
+        'min_degree_keep',2 ...
     );
 
     %%% Per/bond subclass
@@ -133,7 +133,7 @@ methods
             % ---------------------------------------------------------
             % 4. Assign per/atom
             % ---------------------------------------------------------
-            Atoms = AssignPerAtom(obj, Atoms);
+            % Atoms = AssignPerAtom(obj, Atoms);
             % AssignPerAtom should read per-atom settings (if any) from obj
            
 

@@ -55,7 +55,7 @@ function [AtomsOut, BondsOut] = connect_random_mono(obj, Atoms)
     % use lattice spacing as the characteristic local bond scale
     a = obj.domain.min_node_sep;
     if strcmpi(obj.architecture.spacing_multiplier_mode, 'auto')
-        spacing_multiplier = 1.2;
+        spacing_multiplier = 1.8;
     else
         spacing_multiplier = obj.architecture.spacing_multiplier;
     end
@@ -162,7 +162,7 @@ function [AtomsOut, BondsOut] = connect_random_mono(obj, Atoms)
 
     BondsRows = BondsRows(1:nbond,:);
 
-    [AtomsOut, BondsOut] = finalize_network(Atoms, BondsRows, ids, x, y, ...
+    [AtomsOut, BondsOut] = finalize_network(obj, Atoms, BondsRows, ids, x, y, ...
         Max_peratom_bond, min_keep, isPeriodic, Lx, Ly, 1);
 
 end
@@ -360,7 +360,7 @@ function d = minimum_image(isPeriodic, dx, dy, Lx, Ly)
 
 end
 
-function [AtomsOut, BondsOut] = finalize_network(Atoms, BondsRows, ids, x, y, ...
+function [AtomsOut, BondsOut] = finalize_network(obj, Atoms, BondsRows, ids, x, y, ...
     Max_peratom_bond, min_keep, isPeriodic, Lx, Ly, bondType)
 
     natom = size(Atoms,1);
