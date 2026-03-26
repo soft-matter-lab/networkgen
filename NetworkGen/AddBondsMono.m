@@ -54,11 +54,12 @@ function [AtomsOut, BondsOut] = connect_random_mono(obj, Atoms)
     % Monodisperse random cutoff:
     % use lattice spacing as the characteristic local bond scale
     a = obj.domain.min_node_sep;
-    if isempty(obj.architecture.spacing_multiplier)
+    if strcmpi(obj.architecture.spacing_multiplier_mode, 'auto')
         spacing_multiplier = 1.2;
     else
         spacing_multiplier = obj.architecture.spacing_multiplier;
     end
+
     Rcut = a * spacing_multiplier;
     Rcut2 = Rcut * Rcut;
 

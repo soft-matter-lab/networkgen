@@ -20,7 +20,7 @@ properties
     );
     lattice_spacing =           6;
     spacing_multiplier_mode =   'auto';
-    spacing_multiplier =        1;
+    spacing_multiplier =        1.2;
     lattice_disorder_level =     1;
     lattice_disorder_maxfrac =  0.4;
     lattice_max_del_per_node =  1;

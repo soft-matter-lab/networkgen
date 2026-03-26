@@ -52,11 +52,12 @@ function [AtomsOut, BondsOut] = connect_general_poly(obj, Atoms)
     % Poly topology cutoff:
     % larger than mono to allow broader connection-length distribution
     a = obj.domain.min_node_sep;
-    if isempty(obj.architecture.spacing_multiplier)
-        spacing_multiplier = 1.0;
+    if strcmpi(obj.architecture.spacing_multiplier_mode, 'auto')
+        spacing_multiplier = 4.5;
     else
         spacing_multiplier = obj.architecture.spacing_multiplier;
     end
+    
     Rcut = a * spacing_multiplier;
     Rcut2 = Rcut * Rcut;
 
