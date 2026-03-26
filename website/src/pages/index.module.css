@@ -1,11 +1,16 @@
 /* Hero — split layout */
 .heroBanner {
-  display: grid;
-  grid-template-columns: 55% 45%;
-  min-height: 300px;
   border-bottom: 0.5px solid var(--ifm-color-emphasis-200);
+  background: var(--ifm-background-color); /* light side bg */
 }
 
+.heroBannerInner {
+  display: grid;
+  grid-template-columns: 55% 45%;
+  min-height: 400px;
+  max-width: 2000px;
+  margin: 0 auto;
+}
 @media screen and (max-width: 996px) {
   .heroBanner {
     grid-template-columns: 1fr;
@@ -87,5 +92,5 @@
   height: 100%;
   object-fit: cover;
   border-radius: 6px;
-  max-height: 300px;
+  max-height: 400px;
 }
