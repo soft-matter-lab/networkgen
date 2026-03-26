@@ -7,8 +7,8 @@ net.Nreplicates = 1;
 
 %% ---- Domain ----
 net.domain.b                 = 1.6;
-net.domain.Lx                = 100;
-net.domain.Ly                = 100;
+net.domain.Lx                = 1000;
+net.domain.Ly                = 1000;
 net.domain.scale             = 1;
 net.domain.boundary          = 'fixed';
 net.domain.write_location    = './networks';
@@ -17,12 +17,12 @@ net.domain.lammps_viz_file   = 'PolyVisual';
 net.domain.smp_number        = 1;
 
 %% ---- Architecture ----
-net.architecture.geometry           = 'random';
+net.architecture.geometry           = 'random';                       %'random' or 'hex_lattice'
 net.architecture.rho_atom           = 0.0078;
 net.peratom.Max_peratom_bond        = 6;
 
 %% ---- Strand typology ----
-net.architecture.strand_typology.mode = 'mono';
+net.architecture.strand_typology.mode = 'bimodal';
 net.architecture.strand_typology.mono.value = 20;
 
 %% ---- Perbond ----
@@ -35,7 +35,7 @@ net.flags.ilog       = true;
 net.flags.savemode   = true;
 net.flags.imanualseed = false;
 net.flags.idefect    = false;
-net.flags.ipotential = false;
+net.flags.ipotential = true;
 
 %% ---- Generate ----
 net.generateNetwork();

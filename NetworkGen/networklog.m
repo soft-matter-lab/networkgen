@@ -1,4 +1,4 @@
-classdef networklog
+classdef networklog < handle
 % =========================================================================
 % networklog
 %
