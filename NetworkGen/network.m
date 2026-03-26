@@ -92,9 +92,8 @@ properties
         'rho_max',              500 ...
     );
 
-    %%% log
-    log = struct(...
-    );
+    %%% log helper class
+    log networklog
 
 end
 
@@ -105,6 +104,7 @@ methods
         warning off backtrace % Suppress stack trace
         obj.architecture = architecture();
         obj.perbond = bondstyle();
+        obj.log = networklog();
     end
 
     function [] = generateNetwork(obj)
@@ -165,23 +165,23 @@ methods
             % ---------------------------------------------------------
             % 9. Construct local density potential
             % ---------------------------------------------------------
-            LDpot = ConstructLDPotential(obj, Atoms, Bonds, Nvec);
+            % LDpot = ConstructLDPotential(obj, Atoms, Bonds, Nvec);
 
             % ---------------------------------------------------------
             % 10. Scale domain if needed
             % ---------------------------------------------------------
-            [Atoms, Bonds] = ScaleDomain(obj, Atoms, Bonds);
+            % [Atoms, Bonds] = ScaleDomain(obj, Atoms, Bonds);
             
             % ---------------------------------------------------------
             % 11. Show visualization and statistics
             % ---------------------------------------------------------
-            VisualizeNetwork(obj, Atoms, Bonds, Nvec);
+            % VisualizeNetwork(obj, Atoms, Bonds, Nvec);
             % VisualizeNetwork should check obj.flags.iplot internally
 
             % ---------------------------------------------------------
             % 12. Computes
             % ---------------------------------------------------------
-            order = ComputeOrder(obj, Atoms, Bonds);
+            % order = ComputeOrder(obj, Atoms, Bonds);
 
             % ---------------------------------------------------------
             % 13. Write data files

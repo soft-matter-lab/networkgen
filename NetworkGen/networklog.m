@@ -1,4 +1,4 @@
-classdef log < handle
+classdef networklog < handle
 % =========================================================================
 % log  -  Logging subclass for the network framework
 %
@@ -72,6 +72,19 @@ properties
     %%% filename and into the network log header.  Not reset by clear() --
     %%% it persists until explicitly changed by the next setReplicate() call.
     replicate_id = 1;
+    ii = 1
+    Nreplicates = 1
+
+    seed = []
+    sample_suffix = ''
+    replicate_suffix = ''
+    sample_label = ''
+
+    lammps_data_file = ''
+    lammps_viz_file  = ''
+    bond_table_file  = ''
+    log_file         = ''
+    pot_file         = ''
 
 end % properties
 
@@ -81,7 +94,7 @@ methods
     % =================================================================== %
     %  CONSTRUCTOR
     % =================================================================== %
-    function obj = log()
+    function obj = networklog()
         % Nothing to initialise beyond property defaults.
     end
 
