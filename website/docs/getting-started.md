@@ -11,7 +11,7 @@ sidebar_position: 2
 
 ## Installation
 
-See the [Installation guide](../install) for full setup instructions.
+See the [Installation guide](./install) for full setup instructions.
 
 ## Your first network
 
