@@ -4,33 +4,27 @@ sidebar_position: 1
 
 # Intro
 
-Let's discover **Docusaurus in less than 5 minutes**.
+**This site is under construction!**
 
 ## Getting Started
 
-Get started by **creating a new site**.
-
-Or **try Docusaurus immediately** with **[docusaurus.new](https://docusaurus.new)**.
+Get started by **downloading the network generator**.
 
 ### What you'll need
 
-- [Node.js](https://nodejs.org/en/download/) version 20.0 or above:
-  - When installing Node.js, you are recommended to check all checkboxes related to dependencies.
+- [Matlab](https://www.mathworks.com/products/matlab.html) version R2025b or above:
+  - D
 
-## Generate a new site
+## Download NetworkGen
 
-Generate a new Docusaurus site using the **classic template**.
+The code can be directly downloaded from [GitHub](https://github.com/soft-matter-lab/networkgen) as a zipped folder. 
 
-The classic template will automatically be added to your project after you run the command:
+You can also directly clone the project, by running this command in your terminal:
 
 ```bash
-npm init docusaurus@latest my-website classic
+git clone https://github.com/soft-matter-lab/networkgen.git
 ```
-
-You can type this command into Command Prompt, Powershell, Terminal, or any other integrated terminal of your code editor.
-
-The command also installs all necessary dependencies you need to run Docusaurus.
-
+It is recommended to install the most stable release. 
 ## Start your site
 
 Run the development server:

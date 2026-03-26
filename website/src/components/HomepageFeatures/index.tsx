@@ -23,7 +23,7 @@ const FeatureList: FeatureItem[] = [
   },
   {
     title: 'Control network statistics',
-    img: require('@site/static/img/network_gauss_main.png').default,
+    img: require('@site/static/img/network_gauss_main2.png').default,
     description: (
       <>
         Precisely control network statistics, including strand length distribution,
