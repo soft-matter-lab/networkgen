@@ -142,7 +142,8 @@ methods
             % 5. Add bonds
             % ---------------------------------------------------------
             [Atoms, Bonds] = AddBonds(obj, Atoms, LatticeData);
-
+            syncKuhnAssignmentFromTopology(obj);
+            
             % ---------------------------------------------------------
             % 6. Assign per/bond
             % ---------------------------------------------------------
