@@ -116,6 +116,8 @@ methods
             % ---------------------------------------------------------
             localPrepareReplicate(obj, ii, obj.Nreplicates);
 
+            obj.log.setReplicate(ii); % Set current replicate in log for tracking
+
             % ---------------------------------------------------------
             % 2. Construct domain
             % ---------------------------------------------------------
@@ -185,6 +187,14 @@ methods
             % ---------------------------------------------------------
             WriteDataFiles(obj, Atoms, Bonds, Nvec, LDpot, order);
 
+            % ---------------------------------------------------------
+            % 14. Write and clear logs
+            % ---------------------------------------------------------
+            obj.log.recordNetworkStats(Atoms, Bonds, Nvec, obj_network, LDpot, order);
+            
+            obj.log.writeLogs( fullfile(dir,'console.log'), ...
+                               fullfile(dir,'network.log') );
+            obj.log.clear();
         end
 
     end
