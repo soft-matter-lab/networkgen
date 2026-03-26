@@ -102,6 +102,7 @@ methods
 
     % Explicitly initialize subclass objects in the constructor
     function obj = network()
+        warning off backtrace % Suppress stack trace
         obj.architecture = architecture();
         obj.perbond = bondstyle();
     end
@@ -191,6 +192,7 @@ methods
             % 14. Write and clear logs
             % ---------------------------------------------------------
             obj.log.recordNetworkStats(Atoms, Bonds, Nvec, obj_network, LDpot, order);
+            % Collects statistics across arrays and stores in log object for this replicate
             
             obj.log.writeLogs( fullfile(dir,'console.log'), ...
                                fullfile(dir,'network.log') );
