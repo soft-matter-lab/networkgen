@@ -1,0 +1,219 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 13px;
+}
+
+.legend {
+  display: flex;
+  gap: 20px;
+  padding: 8px 0 4px;
+  font-size: 12px;
+  color: var(--ifm-color-secondary-darkest);
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legendDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.connectionNote {
+  font-size: 12px;
+  color: var(--ifm-color-secondary-darkest);
+  padding: 6px 10px;
+  border-left: 3px solid var(--ifm-color-emphasis-300);
+  background: var(--ifm-color-emphasis-100);
+  border-radius: 0 4px 4px 0;
+  margin-bottom: 4px;
+}
+
+.card {
+  border: 0.5px solid var(--ifm-color-emphasis-300);
+  border-left-width: 3px;
+  border-left-style: solid;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--ifm-background-surface-color);
+}
+
+.cardHeader {
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cardHeader:hover {
+  background: var(--ifm-color-emphasis-100);
+}
+
+.cardTitle {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.className {
+  font: 500 14px var(--ifm-font-family-monospace);
+  color: var(--ifm-color-content);
+}
+
+.classKind {
+  font-size: 11px;
+  color: var(--ifm-color-secondary-darkest);
+  background: var(--ifm-color-emphasis-200);
+  padding: 1px 6px;
+  border-radius: 3px;
+}
+
+.cardMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.desc {
+  font-size: 12px;
+  color: var(--ifm-color-secondary-darkest);
+}
+
+.toggle {
+  font-size: 11px;
+  color: var(--ifm-color-secondary-darkest);
+  flex-shrink: 0;
+}
+
+.cardBody {
+  border-top: 0.5px solid var(--ifm-color-emphasis-300);
+}
+
+.fieldTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.fieldTable thead th {
+  padding: 6px 12px;
+  text-align: left;
+  font: 500 11px var(--ifm-font-family-base);
+  color: var(--ifm-color-secondary-darkest);
+  background: var(--ifm-color-emphasis-100);
+  border-bottom: 0.5px solid var(--ifm-color-emphasis-300);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.fieldTable tbody tr {
+  border-bottom: 0.5px solid var(--ifm-color-emphasis-200);
+  transition: background 0.15s;
+}
+
+.fieldTable tbody tr:last-child {
+  border-bottom: none;
+}
+
+.fieldTable tbody tr:hover {
+  background: var(--ifm-color-emphasis-100);
+}
+
+.fieldTable td {
+  padding: 6px 12px;
+  vertical-align: top;
+}
+
+.fieldName {
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.fieldType {
+  font-size: 11px;
+  color: var(--ifm-color-secondary-darkest);
+  white-space: nowrap;
+}
+
+.fieldDefault {
+  font-size: 11px;
+  color: var(--ifm-color-secondary-darkest);
+  white-space: nowrap;
+}
+
+.fieldDesc {
+  font-size: 12px;
+  color: var(--ifm-color-content-secondary);
+  line-height: 1.5;
+}
+
+.methods {
+  padding: 8px 12px 10px;
+  border-top: 0.5px solid var(--ifm-color-emphasis-200);
+  background: var(--ifm-color-emphasis-100);
+}
+
+.methodsLabel {
+  font: 500 10px var(--ifm-font-family-base);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ifm-color-secondary-darkest);
+  margin-bottom: 4px;
+}
+
+.method {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 2px 0;
+}
+
+.methodName {
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.methodDesc {
+  font-size: 12px;
+  color: var(--ifm-color-content-secondary);
+}
+
+.compositionNote {
+  margin-top: 4px;
+  padding: 10px 14px;
+  background: var(--ifm-color-emphasis-100);
+  border: 0.5px solid var(--ifm-color-emphasis-300);
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+.compositionNote strong {
+  display: block;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ifm-color-secondary-darkest);
+  margin-bottom: 6px;
+}
+
+.connRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 0;
+}
+
+.arrow {
+  width: 32px;
+  display: inline-block;
+  text-align: center;
+  font-size: 14px;
+}
