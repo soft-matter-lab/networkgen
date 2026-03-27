@@ -45,7 +45,7 @@ AppUpdatesURL={#AppURL}/releases
 
 ; Default install location: Documents\MATLAB\NetworkGen
 ; This matches MATLAB's default userpath on Windows.
-DefaultDirName={userdocs}\MATLAB\NetworkGen
+DefaultDirName={code:GetDefaultInstallDir}
 DefaultGroupName={#AppName}
 DisableProgramGroupPage=yes
 
@@ -55,6 +55,8 @@ OutputBaseFilename=NetworkGen_v{#AppVersion}_Setup
 
 ; Appearance
 WizardStyle=modern
+SetupIconFile={#SourcePath}\installer\favicon.ico
+UninstallDisplayIcon={#SourcePath}\installer\favicon.ico
 
 ; Compression
 Compression=lzma2/ultra64
@@ -136,7 +138,6 @@ var
   AppPath     : String;
   Marker      : String;
   Line        : String;
-  F           : Integer;
 begin
   StartupFile := GetMatlabStartupFile();
   AppPath     := ExpandConstant('{app}');
@@ -146,14 +147,8 @@ begin
   if StartupContainsMarker(StartupFile, Marker) then
     Exit;  // already present from a previous install
 
-  // Open for append (create if missing)
-  F := FileOpen(StartupFile, fmOpenWrite);
-  if F = -1 then
-    F := FileCreate(StartupFile);
-
-  FileSeek(F, 0, 2);    // seek to end of file
-  FileWrite(F, #13#10 + Line + #13#10);
-  FileClose(F);
+  // Append line to startup.m (SaveStringToFile appends when Append=True)
+  SaveStringToFile(StartupFile, #13#10 + Line + #13#10, True);
 end;
 
 
@@ -204,6 +199,18 @@ procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 begin
   if CurUninstallStep = usPostUninstall then
     RemoveStartupPath();
+end;
+
+
+// ---------------------------------------------------------------------------
+// Default install directory
+// ---------------------------------------------------------------------------
+
+function GetDefaultInstallDir(Param: String): String;
+// Pre-populates the directory page with Documents\MATLAB\NetworkGen.
+// The user can still change it if needed.
+begin
+  Result := ExpandConstant('{userdocs}') + '\MATLAB\NetworkGen';
 end;
 
 
