@@ -17,7 +17,7 @@ The `uniform` assignment mode draws bond values from a flat distribution between
 The lower bound of the uniform distribution.
 
 ```matlab
-net.assignment_mode.uniform.min_value = 2;
+net.architecture.strand_typology.uniform.min_value = 2;
 ```
 
 ---
@@ -31,7 +31,7 @@ net.assignment_mode.uniform.min_value = 2;
 The upper bound of the uniform distribution.
 
 ```matlab
-net.assignment_mode.uniform.max_value = 10;
+net.architecture.strand_typology.uniform.max_value = 10;
 ```
 
 ---
@@ -39,9 +39,9 @@ net.assignment_mode.uniform.max_value = 10;
 ## Example
 
 ```matlab
-net.strand_typology = 'polydisperse';
-net.assignment_mode.auto = false;
-net.assignment_mode.poly.method = 'range';
-net.assignment_mode.uniform.min_value = 3;
-net.assignment_mode.uniform.max_value = 12;
+net.architecture.strand_typology.mode = 'polydisperse';
+net.architecture.strand_typology.auto = false;
+net.architecture.strand_typology.poly.method = 'range';
+net.architecture.strand_typology.uniform.min_value = 3;
+net.architecture.strand_typology.uniform.max_value = 12;
 ```

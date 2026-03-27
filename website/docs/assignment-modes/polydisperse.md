@@ -21,7 +21,7 @@ The method used to generate the polydisperse distribution.
 - **pmf** — probability mass function defined by mean and bounds
 
 ```matlab
-net.assignment_mode.poly.method = 'pmf';
+net.architecture.strand_typology.poly.method = 'pmf';
 ```
 
 ---
@@ -35,7 +35,7 @@ net.assignment_mode.poly.method = 'pmf';
 Minimum allowable bond value in the distribution.
 
 ```matlab
-net.assignment_mode.poly.min_value = 1;
+net.architecture.strand_typology.poly.min_value = 1;
 ```
 
 ---
@@ -49,7 +49,7 @@ net.assignment_mode.poly.min_value = 1;
 When set to `'ascend'`, bonds are sorted and assigned values in ascending order of their length — longer bonds receive larger values.
 
 ```matlab
-net.assignment_mode.poly.align_to_length = 'ascend';
+net.architecture.strand_typology.poly.align_to_length = 'ascend';
 ```
 
 ---
@@ -63,7 +63,7 @@ net.assignment_mode.poly.align_to_length = 'ascend';
 Controls how continuous distribution samples are rounded to integer bond values.
 
 ```matlab
-net.assignment_mode.poly.rounding = 'ceil';
+net.architecture.strand_typology.poly.rounding = 'ceil';
 ```
 
 ---
@@ -80,7 +80,7 @@ Controls how values are mapped across the range when `method = 'range'`.
 - **linear** — values are assigned by linear interpolation across the range
 
 ```matlab
-net.assignment_mode.poly.range_method = 'rank';
+net.architecture.strand_typology.poly.range_method = 'rank';
 ```
 
 ---
@@ -94,7 +94,7 @@ net.assignment_mode.poly.range_method = 'rank';
 Target minimum value for the distribution output.
 
 ```matlab
-net.assignment_mode.poly.target_min = 2;
+net.architecture.strand_typology.poly.target_min = 2;
 ```
 
 ---
@@ -108,7 +108,7 @@ net.assignment_mode.poly.target_min = 2;
 Target maximum value for the distribution output.
 
 ```matlab
-net.assignment_mode.poly.target_max = 15;
+net.architecture.strand_typology.poly.target_max = 15;
 ```
 
 ---
@@ -170,12 +170,12 @@ Method used to convert continuous PMF probabilities to integer counts while pres
 ## Example
 
 ```matlab
-net.strand_typology = 'polydisperse';
-net.assignment_mode.auto = false;
-net.assignment_mode.poly.method = 'pmf';
-net.assignment_mode.poly.pmf_min = 2;
-net.assignment_mode.poly.pmf_max = 20;
-net.assignment_mode.poly.pmf_mean = 7;
-net.assignment_mode.poly.rounding = 'round';
-net.assignment_mode.poly.pmf_cut_mode = 'cap';
+net.architecture.strand_typology.mode = 'polydisperse';
+net.architecture.strand_typology.auto = false;
+net.architecture.strand_typology.poly.method = 'pmf';
+net.architecture.strand_typology.poly.pmf_min = 2;
+net.architecture.strand_typology.poly.pmf_max = 20;
+net.architecture.strand_typology.poly.pmf_mean = 7;
+net.architecture.strand_typology.poly.rounding = 'round';
+net.architecture.strand_typology.poly.pmf_cut_mode = 'cap';
 ```

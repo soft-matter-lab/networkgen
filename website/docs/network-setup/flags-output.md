@@ -17,7 +17,7 @@ These boolean settings control what NetworkGen saves, displays, and logs during 
 When `true`, writes the LAMMPS data file to `write_location`. This is the primary output file used to run LAMMPS simulations.
 
 ```matlab
-net.isave = true;
+net.flags.isave = true;
 ```
 
 ---
@@ -35,7 +35,7 @@ Set `iplot = false` when generating many networks in a loop — rendering plots 
 :::
 
 ```matlab
-net.iplot = true;
+net.flags.iplot = true;
 ```
 
 ---
@@ -49,7 +49,7 @@ net.iplot = true;
 When `true`, writes log files containing generation parameters and network statistics to `write_location`.
 
 ```matlab
-net.ilog = true;
+net.flags.ilog = true;
 ```
 
 ---
@@ -63,7 +63,7 @@ net.ilog = true;
 When `true`, automatically appends `smp_number` to output filenames to prevent overwriting. Recommended when generating multiple network realizations.
 
 ```matlab
-net.savemode = true;
+net.flags.savemode = true;
 net.smp_number = 1;
 ```
 
@@ -78,7 +78,7 @@ net.smp_number = 1;
 When `true`, uses the value of `seed` as the random number generator seed. When `false`, a random seed is used each run.
 
 ```matlab
-net.imanualseed = true;
+net.flags.imanualseed = true;
 net.seed = 42;
 ```
 
@@ -97,8 +97,8 @@ See [Defects](../advanced-features/defects) for full configuration options.
 :::
 
 ```matlab
-net.idefect = true;
-net.defect.N_voids = 5;
+net.flags.idefect = true;
+net.defect.n_voids = 5;
 ```
 
 ---
@@ -116,5 +116,5 @@ See [Potentials & Perbond](../advanced-features/potentials-perbond) for full con
 :::
 
 ```matlab
-net.ipotential = true;
+net.flags.ipotential = true;
 ```

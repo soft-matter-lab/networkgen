@@ -21,5 +21,5 @@ For 2D random networks, a value of `4` to `6` is typical. For hexagonal lattices
 :::
 
 ```matlab
-net.max_peratom_bond = 6;
+net.peratom.Max_peratom_bond = 6;
 ```

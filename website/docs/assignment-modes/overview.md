@@ -29,7 +29,7 @@ Leave `auto = true` unless you need an explicit decoupling between properties â€
 :::
 
 ```matlab
-net.assignment_mode.auto = true;
+net.architecture.strand_typology.auto = true;
 ```
 
 ---

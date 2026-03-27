@@ -21,7 +21,7 @@ These settings must always be configured when using the bimodal mode.
 Mean of the first (typically shorter/lower) distribution.
 
 ```matlab
-net.assignment_mode.bimodal.mean_1 = 3;
+net.architecture.strand_typology.bimodal.mean_1 = 3;
 ```
 
 ---
@@ -35,7 +35,7 @@ net.assignment_mode.bimodal.mean_1 = 3;
 Mean of the second (typically longer/higher) distribution.
 
 ```matlab
-net.assignment_mode.bimodal.mean_2 = 10;
+net.architecture.strand_typology.bimodal.mean_2 = 10;
 ```
 
 ---
@@ -49,7 +49,7 @@ net.assignment_mode.bimodal.mean_2 = 10;
 Standard deviation of the first distribution.
 
 ```matlab
-net.assignment_mode.bimodal.std_1 = 1.0;
+net.architecture.strand_typology.bimodal.std_1 = 1.0;
 ```
 
 ---
@@ -63,7 +63,7 @@ net.assignment_mode.bimodal.std_1 = 1.0;
 Standard deviation of the second distribution.
 
 ```matlab
-net.assignment_mode.bimodal.std_2 = 2.0;
+net.architecture.strand_typology.bimodal.std_2 = 2.0;
 ```
 
 ---
@@ -81,7 +81,7 @@ The method used to generate the bimodal distribution.
 - **gaussian** — uses Gaussian distributions for each mode, parameterised by `mean` and `std`
 
 ```matlab
-net.assignment_mode.bimodal.method = 'gaussian';
+net.architecture.strand_typology.bimodal.method = 'gaussian';
 ```
 
 ---
@@ -98,7 +98,7 @@ Controls how the relative contribution of each distribution is specified.
 - **fixed** — specified as a fixed count via `height_count`
 
 ```matlab
-net.assignment_mode.bimodal.height_mode = 'prob';
+net.architecture.strand_typology.bimodal.height_mode = 'prob';
 ```
 
 ---
@@ -112,7 +112,7 @@ net.assignment_mode.bimodal.height_mode = 'prob';
 Probability that a value is drawn from the first distribution. Only used when `height_mode = 'prob'`. The remaining fraction `(1 - height_prob)` is drawn from the second distribution.
 
 ```matlab
-net.assignment_mode.bimodal.height_prob = 0.4;
+net.architecture.strand_typology.bimodal.height_prob = 0.4;
 ```
 
 ---
@@ -126,7 +126,7 @@ net.assignment_mode.bimodal.height_prob = 0.4;
 Fixed number of values drawn from the first distribution. Only used when `height_mode = 'fixed'`.
 
 ```matlab
-net.assignment_mode.bimodal.height_count = 50;
+net.architecture.strand_typology.bimodal.height_count = 50;
 ```
 
 ---
@@ -140,7 +140,7 @@ net.assignment_mode.bimodal.height_count = 50;
 When `true`, assigns values from the longer/higher distribution first during bond assignment.
 
 ```matlab
-net.assignment_mode.bimodal.long_first = true;
+net.architecture.strand_typology.bimodal.long_first = true;
 ```
 
 ---
@@ -160,7 +160,7 @@ The following settings are specifically relevant when using `bimodal` mode for `
 Standard deviation of the bond end-to-end length for the first mode. Controls the spread of physical bond extension around the mean end-to-end length derived from `mean_1`. Used in conjunction with `lam_1` to set the target prestretch distribution.
 
 ```matlab
-net.assignment_mode.bimodal.stdR_1 = 0.5;
+net.architecture.strand_typology.bimodal.stdR_1 = 0.5;
 ```
 
 ---
@@ -174,7 +174,7 @@ net.assignment_mode.bimodal.stdR_1 = 0.5;
 Standard deviation of the bond end-to-end length for the second mode.
 
 ```matlab
-net.assignment_mode.bimodal.stdR_2 = 0.8;
+net.architecture.strand_typology.bimodal.stdR_2 = 0.8;
 ```
 
 ---
@@ -188,7 +188,7 @@ net.assignment_mode.bimodal.stdR_2 = 0.8;
 Target mean prestretch for bonds in the first mode. Defines the desired mean end-to-end extension relative to the contour length of strands in this mode. Works alongside `auto_1_flag` and `stdR_1` to fully specify the prestretch distribution.
 
 ```matlab
-net.assignment_mode.bimodal.lam_1 = 0.5;
+net.architecture.strand_typology.bimodal.lam_1 = 0.5;
 ```
 
 ---
@@ -202,7 +202,7 @@ net.assignment_mode.bimodal.lam_1 = 0.5;
 Target mean prestretch for bonds in the second mode.
 
 ```matlab
-net.assignment_mode.bimodal.lam_2 = 0.3;
+net.architecture.strand_typology.bimodal.lam_2 = 0.3;
 ```
 
 ---
@@ -220,8 +220,8 @@ Once `auto_1_flag` ensures the mean prestretch is accurate, you can control the 
 :::
 
 ```matlab
-net.assignment_mode.bimodal.auto_1_flag = true;
-net.assignment_mode.bimodal.lam_1 = 0.5;
+net.architecture.strand_typology.bimodal.auto_1_flag = true;
+net.architecture.strand_typology.bimodal.lam_1 = 0.5;
 ```
 
 ---
@@ -235,8 +235,8 @@ net.assignment_mode.bimodal.lam_1 = 0.5;
 When `true`, overrides `mean_2` and automatically adjusts the Kuhn count for mode 2 to ensure the mean bond prestretch matches `lam_2`.
 
 ```matlab
-net.assignment_mode.bimodal.auto_2_flag = true;
-net.assignment_mode.bimodal.lam_2 = 0.3;
+net.architecture.strand_typology.bimodal.auto_2_flag = true;
+net.architecture.strand_typology.bimodal.lam_2 = 0.3;
 ```
 
 ---
@@ -250,7 +250,7 @@ net.assignment_mode.bimodal.lam_2 = 0.3;
 When `true`, generates an interpenetrating double network structure where each distribution mode corresponds to a distinct sub-network.
 
 ```matlab
-net.assignment_mode.bimodal.double_net_flag = true;
+net.architecture.strand_typology.bimodal.double_network_flag = true;
 ```
 
 ---
@@ -264,7 +264,7 @@ net.assignment_mode.bimodal.double_net_flag = true;
 Mesh ratio for the double network. Defines the size of the second sub-network relative to the first — a smaller `alpha` produces a finer second network embedded within the coarser first. Only used when `double_net_flag = true`.
 
 ```matlab
-net.assignment_mode.bimodal.alpha = 0.5;
+net.architecture.strand_typology.bimodal.alpha = 0.5;
 ```
 
 ---
@@ -281,12 +281,12 @@ Controls whether the bin window used to sort bonds into each distribution mode i
 - **manual** — the user controls the bin boundaries via `manual_deviation_type`, allowing explicit control over the prestretch deviation
 
 ```matlab
-net.assignment_mode.bimodal.bin_window_method = 'manual';
+net.architecture.strand_typology.bimodal.bin_window_method = 'manual';
 ```
 
 ---
 
-### `bimodal.manual_deviation_type`
+### `bimodal.manual_dev_type`
 
 | Type | Args | Default |
 |------|------|---------|
@@ -305,7 +305,7 @@ For complete control over prestretch statistics:
 :::
 
 ```matlab
-net.assignment_mode.bimodal.manual_deviation_type = 'both';
+net.architecture.strand_typology.bimodal.manual_dev_type = 'both';
 ```
 
 ---
@@ -313,25 +313,25 @@ net.assignment_mode.bimodal.manual_deviation_type = 'both';
 ## Example
 
 ```matlab
-net.strand_typology = 'bimodal';
-net.assignment_mode.auto = false;
-net.assignment_mode.bimodal.method = 'gaussian';
-net.assignment_mode.bimodal.mean_1 = 3;
-net.assignment_mode.bimodal.mean_2 = 10;
-net.assignment_mode.bimodal.std_1 = 1.0;
-net.assignment_mode.bimodal.std_2 = 2.0;
-net.assignment_mode.bimodal.height_mode = 'prob';
-net.assignment_mode.bimodal.height_prob = 0.5;
+net.architecture.strand_typology.mode = 'bimodal';
+net.architecture.strand_typology.auto = false;
+net.architecture.strand_typology.bimodal.method = 'gaussian';
+net.architecture.strand_typology.bimodal.mean_1 = 3;
+net.architecture.strand_typology.bimodal.mean_2 = 10;
+net.architecture.strand_typology.bimodal.std_1 = 1.0;
+net.architecture.strand_typology.bimodal.std_2 = 2.0;
+net.architecture.strand_typology.bimodal.height_mode = 'prob';
+net.architecture.strand_typology.bimodal.height_prob = 0.5;
 ```
 
 **With prestretch control:**
 ```matlab
-net.assignment_mode.bimodal.auto_1_flag = true;
-net.assignment_mode.bimodal.auto_2_flag = true;
-net.assignment_mode.bimodal.lam_1 = 0.5;
-net.assignment_mode.bimodal.lam_2 = 0.3;
-net.assignment_mode.bimodal.bin_window_method = 'manual';
-net.assignment_mode.bimodal.manual_deviation_type = 'both';
-net.assignment_mode.bimodal.stdR_1 = 0.5;
-net.assignment_mode.bimodal.stdR_2 = 0.8;
+net.architecture.strand_typology.bimodal.auto_1_flag = true;
+net.architecture.strand_typology.bimodal.auto_2_flag = true;
+net.architecture.strand_typology.bimodal.lam_1 = 0.5;
+net.architecture.strand_typology.bimodal.lam_2 = 0.3;
+net.architecture.strand_typology.bimodal.bin_window_method = 'manual';
+net.architecture.strand_typology.bimodal.manual_dev_type = 'both';
+net.architecture.strand_typology.bimodal.stdR_1 = 0.5;
+net.architecture.strand_typology.bimodal.stdR_2 = 0.8;
 ```

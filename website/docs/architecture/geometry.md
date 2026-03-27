@@ -20,7 +20,7 @@ Defines the base pattern used to place nodes in the domain.
 - **hex** — nodes are placed on a hexagonal lattice, producing a regular network. Disorder can be introduced via `lattice_disorder_level`
 
 ```matlab
-net.geometry = 'hex';
+net.architecture.geometry = 'hex_lattice';
 ```
 
 ---
@@ -31,10 +31,10 @@ net.geometry = 'hex';
 |------|------|---------|
 | `double` | (0, ∞) | — |
 
-The nominal spacing between nodes on the lattice, in units of `b`. Previously referred to as `min_node_sep`. Only relevant when `geometry = 'hex'`.
+The nominal spacing between nodes on the lattice, in units of `b`. Previously referred to as `min_node_sep`. Only relevant when `geometry = 'hex_lattice'`.
 
 ```matlab
-net.lattice_spacing = 1.5;
+net.architecture.lattice_spacing = 1.5;
 ```
 
 ---
@@ -45,10 +45,10 @@ net.lattice_spacing = 1.5;
 |------|------|---------|
 | `string` | `'auto'` \| `'manual'` | `'auto'` |
 
-Controls whether the spacing multiplier is computed automatically or set manually. Only relevant when `geometry = 'hex'`.
+Controls whether the spacing multiplier is computed automatically or set manually. Only relevant when `geometry = 'hex_lattice'`.
 
 ```matlab
-net.spacing_multiplier_mode = 'manual';
+net.architecture.spacing_multiplier_mode = 'manual';
 ```
 
 ---
@@ -62,7 +62,7 @@ net.spacing_multiplier_mode = 'manual';
 A manual scaling factor applied to `lattice_spacing`. Only used when `spacing_multiplier_mode = 'manual'`.
 
 ```matlab
-net.spacing_multiplier = 1.2;
+net.architecture.spacing_multiplier = 1.2;
 ```
 
 ---
@@ -73,10 +73,10 @@ net.spacing_multiplier = 1.2;
 |------|------|---------|
 | `double` | [0, 1] | `0` |
 
-Controls the magnitude of random positional perturbations applied to lattice nodes. `0` = perfect lattice, `1` = maximum disorder. Only relevant when `geometry = 'hex'`.
+Controls the magnitude of random positional perturbations applied to lattice nodes. `0` = perfect lattice, `1` = maximum disorder. Only relevant when `geometry = 'hex_lattice'`.
 
 ```matlab
-net.lattice_disorder_level = 0.3;
+net.architecture.lattice_disorder_level = 0.3;
 ```
 
 ---
@@ -90,7 +90,7 @@ net.lattice_disorder_level = 0.3;
 Sets the maximum fractional displacement of a node from its ideal lattice position. Works in conjunction with `lattice_disorder_level`.
 
 ```matlab
-net.lattice_disorder_maxfrac = 0.5;
+net.architecture.lattice_disorder_maxfrac = 0.5;
 ```
 
 ---
@@ -104,7 +104,7 @@ net.lattice_disorder_maxfrac = 0.5;
 When `true`, introduces topological disorder by randomly removing bonds from the lattice in addition to positional disorder.
 
 ```matlab
-net.lattice_topo_disorder_flag = true;
+net.architecture.lattice_topo_disorder_flag = true;
 ```
 
 ---
@@ -118,7 +118,7 @@ net.lattice_topo_disorder_flag = true;
 Maximum number of bonds that can be deleted per node when topological disorder is active. Bounded above to ensure each node retains at least 2 connections.
 
 ```matlab
-net.lattice_max_del_per_node = 2;
+net.architecture.lattice_max_del_per_node = 2;
 ```
 
 ---
@@ -132,7 +132,7 @@ net.lattice_max_del_per_node = 2;
 Minimum node degree (number of bonds) to maintain during topological disorder. Nodes will not have bonds removed below this threshold.
 
 ```matlab
-net.lattice_min_degree_keep = 3;
+net.architecture.lattice_min_degree_keep = 3;
 ```
 
 ---
@@ -146,5 +146,5 @@ net.lattice_min_degree_keep = 3;
 Target atom number density (atoms per unit area in 2D, atoms per unit volume in 3D). Used to determine the total number of nodes to place in the domain.
 
 ```matlab
-net.rho_atom = 0.5;
+net.architecture.rho_atom = 0.5;
 ```

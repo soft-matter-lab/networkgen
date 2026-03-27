@@ -17,7 +17,7 @@ The `mono` assignment mode assigns a single fixed value to all bonds. Used when 
 The fixed value assigned to all bonds. For bond lengths this is typically a positive integer representing the number of Kuhn segments.
 
 ```matlab
-net.strand_typology = 'mono';
-net.assignment_mode.auto = false;
-net.assignment_mode.mono.value = 5;
+net.architecture.strand_typology.mode = 'mono';
+net.architecture.strand_typology.auto = false;
+net.architecture.strand_typology.mono.value = 5;
 ```

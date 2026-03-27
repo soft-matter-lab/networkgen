@@ -17,7 +17,7 @@ NetworkGen supports networks with multiple atom and bond types, allowing heterog
 Number of distinct atom types in the network.
 
 ```matlab
-net.types.natom_type = 2;
+net.architecture.types.natom_type = 2;
 ```
 
 ---
@@ -31,7 +31,7 @@ net.types.natom_type = 2;
 Number of distinct bond types in the network.
 
 ```matlab
-net.types.nbond_type = 2;
+net.architecture.types.nbond_type = 2;
 ```
 
 ---
@@ -48,7 +48,7 @@ Controls how atom type counts are specified.
 - **frac** — specify fractions via `atom_frac`
 
 ```matlab
-net.types.atype_mode = 'frac';
+net.architecture.types.atype_mode = 'frac';
 ```
 
 ---
@@ -65,7 +65,7 @@ Controls how bond type counts are specified.
 - **frac** — specify fractions via `bond_frac`
 
 ```matlab
-net.types.btype_mode = 'frac';
+net.architecture.types.btype_mode = 'frac';
 ```
 
 ---
@@ -79,7 +79,7 @@ net.types.btype_mode = 'frac';
 Array of atom counts per type. Only used when `atype_mode = 'fixed'`.
 
 ```matlab
-net.types.atom_count = [100, 50];
+net.architecture.types.atom_count = [100, 50];
 ```
 
 ---
@@ -93,7 +93,7 @@ net.types.atom_count = [100, 50];
 Array of bond counts per type. Only used when `btype_mode = 'fixed'`.
 
 ```matlab
-net.types.bond_count = [200, 80];
+net.architecture.types.bond_count = [200, 80];
 ```
 
 ---
@@ -107,7 +107,7 @@ net.types.bond_count = [200, 80];
 Array of atom type fractions. Must sum to 1. Only used when `atype_mode = 'frac'`.
 
 ```matlab
-net.types.atom_frac = [0.7, 0.3];
+net.architecture.types.atom_frac = [0.7, 0.3];
 ```
 
 ---
@@ -121,7 +121,7 @@ net.types.atom_frac = [0.7, 0.3];
 Array of bond type fractions. Must sum to 1. Only used when `btype_mode = 'frac'`.
 
 ```matlab
-net.types.bond_frac = [0.6, 0.4];
+net.architecture.types.bond_frac = [0.6, 0.4];
 ```
 
 ---
@@ -145,7 +145,7 @@ Each row specifies a connection that is **not allowed**, not one that is require
 ```matlab
 % Bond type 1 cannot connect atom type 1 to atom type 2
 % Bond type 1 cannot connect two atoms of type 1
-net.types.connectivity = [1, 1, 2;
+net.architecture.types.connectivity = [1, 1, 2;
                            1, 1, 1];
 ```
 
@@ -174,12 +174,12 @@ Method used to select which bonds are assigned each type. Currently only `'rando
 ## Example
 
 ```matlab
-net.types.natom_type = 2;
-net.types.nbond_type = 2;
-net.types.atype_mode = 'frac';
-net.types.btype_mode = 'frac';
-net.types.atom_frac = [0.7, 0.3];
-net.types.bond_frac = [0.6, 0.4];
+net.architecture.types.natom_type = 2;
+net.architecture.types.nbond_type = 2;
+net.architecture.types.atype_mode = 'frac';
+net.architecture.types.btype_mode = 'frac';
+net.architecture.types.atom_frac = [0.7, 0.3];
+net.architecture.types.bond_frac = [0.6, 0.4];
 % No connectivity restrictions — any bond type can connect any atom types
-net.types.connectivity = [];
+net.architecture.types.connectivity = [];
 ```

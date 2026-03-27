@@ -4,43 +4,69 @@ sidebar_position: 0
 
 # Installation
 
-## Requirements
+## Step 1 — Get the source files
 
-- MATLAB R2020a or later
-- Git
+NetworkGen is distributed as a set of MATLAB `.m` files. Download them using one of the following methods.
 
-## Clone the repository
+### Option A — Download a release
+
+Go to the [GitHub Releases page](https://github.com/soft-matter-lab/networkgen/releases) and download the latest source `.zip`. On Windows, a one-click installer is also available that copies the files and adds them to your MATLAB path automatically.
+
+### Option B — Clone with Git
 
 ```bash
 git clone https://github.com/soft-matter-lab/networkgen.git
-cd networkgen
 ```
 
-## Add NetworkGen to your MATLAB path
+---
 
-In MATLAB, add the NetworkGen directory to your path. You can do this either for a single session or permanently.
+## Step 2 — Choose how to run
 
-**Single session:**
+Once you have the source files, you can run NetworkGen either directly in MATLAB or from Python via Octave.
+
+### MATLAB
+
+**Requirements:** MATLAB R2020a or later.
+
+Add the NetworkGen folder to your MATLAB path:
+
 ```matlab
-addpath(genpath('/path/to/networkgen'));
+addpath(genpath('/path/to/NetworkGen'));
 ```
 
-**Permanent (recommended):**
+To make this permanent, add the line above to your `startup.m` file.
 
-Run `addpath.bat` on Windows, or add the following to your `startup.m` file:
+Verify the installation:
+
 ```matlab
-addpath(genpath('/path/to/networkgen'));
-```
-
-## Verify the installation
-
-Run the following in MATLAB to confirm everything is working:
-```matlab
-net = Network();
+net = network();
 disp(net)
 ```
 
-You should see the default `Network` object properties printed to the console.
+### Python (via Octave)
+
+**Requirements:**
+- Octave 7.0+ ([octave.org/download](https://octave.org/download))
+- Python 3.10+
+- `oct2py` and `numpy`
+
+Install Octave first, then use the [Config Builder](/config-builder) to generate a Python script, or write one directly:
+
+```python
+from oct2py import octave
+
+octave.addpath(octave.genpath('/path/to/NetworkGen'))
+
+octave.eval("""
+    net = network();
+    net.domain.Lx = 10;
+    net.domain.Ly = 10;
+    net.flags.iplot = false;
+    net.generateNetwork();
+""")
+```
+
+---
 
 ## LAMMPS
 

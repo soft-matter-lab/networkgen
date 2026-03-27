@@ -142,8 +142,8 @@ net.pot.rho_max = 0.99;
 ## Example
 
 ```matlab
-net.ipotential = true;
-net.ilog = true; % outputs equilibrium separation for bpm/spring
+net.flags.ipotential = true;
+net.flags.ilog = true; % outputs equilibrium separation for bpm/spring
 
 % Kuhn auto-coupled to strand_typology
 net.perbond.kuhn.auto = true;

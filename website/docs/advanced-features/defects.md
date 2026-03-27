@@ -12,7 +12,7 @@ NetworkGen can introduce voids and damage into the network to simulate pre-exist
 
 | Type | Args | Default |
 |------|------|---------|
-| `string` | `'count'` \| `'area_fraction'` | `'count'` |
+| `string` | `'count'` \| `'area_frac'` | `'count'` |
 
 Controls how the number of voids is specified.
 
@@ -20,12 +20,12 @@ Controls how the number of voids is specified.
 - **area_fraction** — specify what fraction of the domain area should be void via `void_area_frac`
 
 ```matlab
-net.defect.density_mode = 'area_fraction';
+net.defect.density_mode = 'area_frac';
 ```
 
 ---
 
-### `defect.N_voids`
+### `defect.n_voids`
 
 | Type | Args | Default |
 |------|------|---------|
@@ -34,7 +34,7 @@ net.defect.density_mode = 'area_fraction';
 Number of voids to introduce. Only used when `density_mode = 'count'`.
 
 ```matlab
-net.defect.N_voids = 10;
+net.defect.n_voids = 10;
 ```
 
 ---
@@ -45,7 +45,7 @@ net.defect.N_voids = 10;
 |------|------|---------|
 | `double` | [0, 1] | — |
 
-Target fraction of domain area occupied by voids. Only used when `density_mode = 'area_fraction'`.
+Target fraction of domain area occupied by voids. Only used when `density_mode = 'area_frac'`.
 
 ```matlab
 net.defect.void_area_frac = 0.1; % 10% void area
@@ -298,9 +298,9 @@ net.defect.clamp_thickness = 1.5;
 ## Example
 
 ```matlab
-net.idefect = true;
+net.flags.idefect = true;
 net.defect.density_mode = 'count';
-net.defect.N_voids = 5;
+net.defect.n_voids = 5;
 net.defect.size_dist = 'gaussian';
 net.defect.radius_mean = 2.0;
 net.defect.radius_std = 0.5;

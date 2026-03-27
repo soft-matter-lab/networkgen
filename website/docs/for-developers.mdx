@@ -21,3 +21,151 @@ Click any class header to expand its complete field list.
 
 <ClassDiagram />
 
+---
+
+## Complete field listing
+
+All fields across all four classes. Fields marked with **†** are computed internally during generation and should not be set manually — they are documented here for developers who need to read or extend the pipeline.
+
+### `network`
+
+| Field | Type | Default | Notes |
+|-------|------|---------|-------|
+| `Nreplicates` | `int` | `1` | |
+| `flags.isave` | `boolean` | `true` | |
+| `flags.iplot` | `boolean` | `true` | |
+| `flags.ilog` | `boolean` | `true` | |
+| `flags.savemode` | `boolean` | `true` | |
+| `flags.imanualseed` | `boolean` | `false` | |
+| `flags.idefect` | `boolean` | `false` | |
+| `flags.ipotential` | `boolean` | `true` | |
+| `domain.b` | `double` | `1.6` | |
+| `domain.dimension` | `int` | `2` | |
+| `domain.Lx` | `double` | `150` | |
+| `domain.Ly` | `double` | `150` | |
+| `domain.Lz` | `double` | `10` | |
+| `domain.scale` | `double` | `1` | |
+| `domain.boundary` | `string` | `'fixed'` | |
+| `domain.seed` | `int` | `12345` | |
+| `domain.write_location` | `string` | `'./networks'` | |
+| `domain.lammps_data_file` | `string` | `'PolyNetwork'` | |
+| `domain.lammps_viz_file` | `string` | `'PolyVisual'` | |
+| `domain.bond_table_file` | `string` | `'bond'` | |
+| `domain.smp_number` | `int` | `1` | |
+| `domain.xlo` **†** | `double` | `[]` | Computed by `SetupDomain` |
+| `domain.xhi` **†** | `double` | `[]` | Computed by `SetupDomain` |
+| `domain.ylo` **†** | `double` | `[]` | Computed by `SetupDomain` |
+| `domain.yhi` **†** | `double` | `[]` | Computed by `SetupDomain` |
+| `domain.zlo` **†** | `double` | `[]` | Computed by `SetupDomain` |
+| `domain.zhi` **†** | `double` | `[]` | Computed by `SetupDomain` |
+| `domain.Max_atom` **†** | `int` | `[]` | Computed from `rho_atom` and domain area |
+| `domain.Max_bond` **†** | `int` | `[]` | Computed from `Max_atom` and `Max_peratom_bond` |
+| `domain.min_node_sep` **†** | `double` | `[]` | Computed from `lattice_spacing * b` |
+| `domain.min_node_sep2` **†** | `double` | `[]` | `min_node_sep²` |
+| `domain.node_scatter_max_tries` **†** | `int` | `[]` | Computed scatter attempt budget |
+| `domain.bond_global_try_limit` **†** | `int` | `[]` | Computed bond attempt budget |
+| `domain.max_attempts_without_progress` **†** | `int` | `[]` | Stall detection threshold |
+| `domain.max_tries_per_node_sample` **†** | `int` | `[]` | Per-node scatter retry budget |
+| `peratom.Max_peratom_bond` | `int` | `[]` | Must be set before generation |
+| `peratom.min_degree_keep` | `int` | `2` | |
+| `defect.density_mode` | `string` | `'area_frac'` | |
+| `defect.n_voids` | `int` | `0` | |
+| `defect.void_area_frac` | `double` | `0.75` | |
+| `defect.size_dist` | `string` | `'gaussian'` | |
+| `defect.radius_mean` | `double` | `12` | |
+| `defect.radius_std` | `double` | `4` | |
+| `defect.radius_min` | `double` | `2` | |
+| `defect.radius_max` | `double` | `30` | |
+| `defect.shape_roughness` | `double` | `0.3` | |
+| `defect.shape_n_modes` | `int` | `2` | |
+| `defect.void_overlap` | `boolean` | `false` | |
+| `defect.bridge_width` | `double` | `1` | |
+| `defect.center_distribution` | `string` | `'clustered'` | |
+| `defect.n_cluster_parents` | `int` | `2` | |
+| `defect.cluster_spread` | `double` | `10` | |
+| `defect.margin_frac` | `double` | `0.15` | |
+| `defect.prune_isolated` | `boolean` | `true` | |
+| `defect.sparse_network` | `boolean` | `true` | |
+| `defect.wall_thickness` | `double` | `18` | |
+| `defect.clamp_thickness` | `double` | `0.12` | |
+| `pot.k_LD` | `double` | `0.414` | |
+| `pot.N_rho` | `int` | `100000` | |
+| `pot.rho_min` | `double` | `0.0` | |
+| `pot.rho_max` | `double` | `500` | |
+
+### `architecture`
+
+| Field | Type | Default | Notes |
+|-------|------|---------|-------|
+| `geometry` | `string` | `'random'` | |
+| `rho_atom` | `double` | `0.0078` | |
+| `lattice_spacing` | `double` | `6` | |
+| `spacing_multiplier_mode` | `string` | `'auto'` | |
+| `spacing_multiplier` | `double` | `1.2` | |
+| `lattice_disorder_level` | `double` | `1` | |
+| `lattice_disorder_maxfrac` | `double` | `0.4` | |
+| `lattice_max_del_per_node` | `int` | `1` | |
+| `lattice_min_degree_keep` | `int` | `5` | |
+| `strand_typology` | `assignmentmode` | — | See `assignmentmode` table |
+| `types.natom_type` | `int` | `1` | |
+| `types.nbond_type` | `int` | `5` | |
+| `types.atype_mode` | `string` | `'frac'` | |
+| `types.btype_mode` | `string` | `'frac'` | |
+| `types.atom_count` | `int array` | `0` | |
+| `types.bond_count` | `int array` | `0` | |
+| `types.atom_frac` | `double array` | `1` | |
+| `types.bond_frac` | `double array` | `1` | |
+| `types.connectivity` | `int array` | `[]` | |
+| `types.atype_sel_method` | `string` | `'random'` | |
+| `types.btype_sel_method` | `string` | `'random'` | |
+
+### `bondstyle`
+
+| Field | Type | Default | Notes |
+|-------|------|---------|-------|
+| `type` | `int` | `1` | |
+| `kuhn` | `assignmentmode` | — | See `assignmentmode` table |
+
+### `assignmentmode`
+
+Used as both `net.architecture.strand_typology` and `net.perbond.kuhn`.
+
+| Field | Type | Default | Notes |
+|-------|------|---------|-------|
+| `auto` | `boolean` | `true` | |
+| `mode` | `string` | `'mono'` | |
+| `mono.value` | `double` | `20` | |
+| `uniform.min_value` | `double` | `5` | |
+| `uniform.max_value` | `double` | `40` | |
+| `poly.method` | `string` | `'pmf'` | |
+| `poly.min_value` | `double` | `1` | |
+| `poly.align_to_length` | `string` | `'ascend'` | |
+| `poly.rounding` | `string` | `'round'` | |
+| `poly.range_method` | `string` | `'rank'` | |
+| `poly.target_min` | `double` | `5` | |
+| `poly.target_max` | `double` | `120` | |
+| `poly.pmf_min` | `double` | `20` | |
+| `poly.pmf_max` | `double` | `120` | |
+| `poly.pmf_mean` | `double` | `40` | |
+| `poly.pmf_cut_mode` | `string` | `'cap'` | |
+| `poly.pmf_integerize_rule` | `string` | `'largest_remainder'` | |
+| `bimodal.mean_1` | `double` | `35` | |
+| `bimodal.mean_2` | `double` | `60` | |
+| `bimodal.std_1` | `double` | `10` | |
+| `bimodal.std_2` | `double` | `5` | |
+| `bimodal.method` | `string` | `'gaussian'` | |
+| `bimodal.height_mode` | `string` | `'prob'` | |
+| `bimodal.height_prob` | `double` | `1.0` | |
+| `bimodal.height_count` | `int` | `2` | |
+| `bimodal.long_first` | `boolean` | `true` | |
+| `bimodal.double_network_flag` | `boolean` | `true` | |
+| `bimodal.alpha` | `double` | `3.0` | |
+| `bimodal.auto_1_flag` | `boolean` | `false` | |
+| `bimodal.auto_2_flag` | `boolean` | `true` | |
+| `bimodal.bin_window_method` | `string` | `'manual'` | |
+| `bimodal.manual_dev_type` | `string` | `'mixed'` | |
+| `bimodal.stdR_1` | `double` | `3` | |
+| `bimodal.stdR_2` | `double` | `10` | |
+| `bimodal.lam_1` | `double` | `0.2` | |
+| `bimodal.lam_2` | `double` | `0.5` | |
+| `bimodal.min_value` | `int` | `1` | |
