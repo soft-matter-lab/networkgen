@@ -1,0 +1,144 @@
+---
+sidebar_position: 1
+---
+
+import TutorialHeader from '@site/src/components/TutorialHeader';
+
+# Double networks
+
+<TutorialHeader
+  title="Double networks"
+  description="Generate an interpenetrating double network where two distinct sub-networks — one short and stiff, one long and extensible — occupy the same domain with a controlled mesh ratio."
+  imagePlaceholder="Double network image"
+  tags={[{label: 'random'}, {label: 'bimodal'}, {label: 'double network'}, {label: '2D'}]}
+  difficulty="advanced"
+/>
+
+## Overview
+
+A double network is a bimodal network where the two strand populations form topologically distinct sub-networks rather than being randomly mixed. The `alpha` parameter controls the mesh ratio — the relative size of the second (fine) network relative to the first (coarse). This architecture closely mimics double network hydrogels and tough biological tissues.
+
+:::note Prerequisite
+Complete the [Bimodal](../random-basic/bimodal) tutorial first. Double networks build directly on that configuration.
+:::
+
+---
+
+## Step 1 — Start from a bimodal configuration
+
+```matlab
+net = network();
+
+net.domain.b        = 1.6;
+net.domain.Lx       = 20;
+net.domain.Ly       = 20;
+net.domain.boundary = 'periodic';
+
+net.architecture.geometry = 'random';
+net.architecture.rho_atom = 0.0078;
+
+net.architecture.strand_typology.mode                = 'bimodal';
+net.architecture.strand_typology.bimodal.method      = 'gaussian';
+net.architecture.strand_typology.bimodal.mean_1      = 10;
+net.architecture.strand_typology.bimodal.mean_2      = 40;
+net.architecture.strand_typology.bimodal.std_1       = 2;
+net.architecture.strand_typology.bimodal.std_2       = 5;
+net.architecture.strand_typology.bimodal.height_mode = 'prob';
+net.architecture.strand_typology.bimodal.height_prob = 0.4;
+```
+
+---
+
+## Step 2 — Enable double network mode
+
+```matlab
+net.architecture.strand_typology.bimodal.double_network_flag = true;
+```
+
+This tells the generator to treat the two populations as distinct interpenetrating sub-networks rather than a random mixture.
+
+---
+
+## Step 3 — Set the mesh ratio
+
+```matlab
+net.architecture.strand_typology.bimodal.alpha = 5.0;
+```
+
+`alpha` is the mesh ratio — the size of the second (fine) network relative to the first (coarse). A value of `5.0` means the second sub-network has 5× finer mesh spacing. Larger values produce a more densely woven second network.
+
+:::tip Choosing alpha
+Start with `alpha` between `3` and `8`. Very large values can make the second network too dense for the domain size, causing the generator to struggle with node placement.
+:::
+
+---
+
+## Step 4 — Auto-flags for each sub-network
+
+```matlab
+net.architecture.strand_typology.bimodal.auto_1_flag = true;
+net.architecture.strand_typology.bimodal.auto_2_flag = true;
+net.architecture.strand_typology.bimodal.lam_1       = 0.2;
+net.architecture.strand_typology.bimodal.lam_2       = 0.5;
+```
+
+`auto_1_flag` and `auto_2_flag` override the user-specified means and instead automatically adjust Kuhn counts so the mean prestretch of each sub-network matches `lam_1` and `lam_2` respectively.
+
+---
+
+## Step 5 — Configure perbond and generate
+
+```matlab
+net.peratom.Max_peratom_bond = 6;
+net.perbond.kuhn.auto        = true;
+
+net.flags.isave = true;
+net.flags.iplot = true;
+net.flags.ilog  = true;
+net.domain.write_location   = './networks';
+net.domain.lammps_data_file = 'DoubleNetwork';
+
+net.generateNetwork();
+```
+
+---
+
+## Full script
+
+```matlab
+net = network();
+
+net.domain.b        = 1.6;
+net.domain.Lx       = 20;
+net.domain.Ly       = 20;
+net.domain.boundary = 'periodic';
+
+net.architecture.geometry = 'random';
+net.architecture.rho_atom = 0.0078;
+
+net.architecture.strand_typology.mode                       = 'bimodal';
+net.architecture.strand_typology.bimodal.method             = 'gaussian';
+net.architecture.strand_typology.bimodal.mean_1             = 10;
+net.architecture.strand_typology.bimodal.mean_2             = 40;
+net.architecture.strand_typology.bimodal.std_1              = 2;
+net.architecture.strand_typology.bimodal.std_2              = 5;
+net.architecture.strand_typology.bimodal.height_mode        = 'prob';
+net.architecture.strand_typology.bimodal.height_prob        = 0.4;
+net.architecture.strand_typology.bimodal.double_network_flag = true;
+net.architecture.strand_typology.bimodal.alpha              = 5.0;
+net.architecture.strand_typology.bimodal.auto_1_flag        = true;
+net.architecture.strand_typology.bimodal.auto_2_flag        = true;
+net.architecture.strand_typology.bimodal.lam_1              = 0.2;
+net.architecture.strand_typology.bimodal.lam_2              = 0.5;
+
+net.peratom.Max_peratom_bond = 6;
+net.perbond.kuhn.auto        = true;
+
+net.flags.isave = true;
+net.flags.iplot = true;
+net.flags.ilog  = true;
+net.domain.write_location   = './networks';
+net.domain.lammps_data_file = 'DoubleNetwork';
+
+net.generateNetwork();
+```

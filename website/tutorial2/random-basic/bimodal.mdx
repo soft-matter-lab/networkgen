@@ -1,0 +1,150 @@
+---
+sidebar_position: 3
+---
+
+import TutorialHeader from '@site/src/components/TutorialHeader';
+
+# Bimodal random network
+
+<TutorialHeader
+  title="Bimodal random network"
+  description="Generate a 2D random network with two distinct strand populations — short stiff strands and long extensible strands — mixed in a controlled ratio."
+  imagePlaceholder="Bimodal network image"
+  tags={[{label: 'random'}, {label: 'bimodal'}, {label: '2D'}]}
+  difficulty="intermediate"
+/>
+
+## Overview
+
+A bimodal network contains two distinct populations of strands drawn from separate Gaussian distributions. This mimics the architecture of biological networks and double network hydrogels. The mixing ratio, means, and standard deviations of each population are all configurable.
+
+---
+
+## Step 1 — Create the network object
+
+```matlab
+net = network();
+```
+
+---
+
+## Step 2 — Set the domain
+
+```matlab
+net.domain.b        = 1.6;
+net.domain.Lx       = 20;
+net.domain.Ly       = 20;
+net.domain.boundary = 'periodic';
+```
+
+---
+
+## Step 3 — Configure geometry
+
+```matlab
+net.architecture.geometry = 'random';
+net.architecture.rho_atom = 0.0078;
+```
+
+---
+
+## Step 4 — Set strand typology to bimodal
+
+```matlab
+net.architecture.strand_typology.mode = 'bimodal';
+```
+
+---
+
+## Step 5 — Configure the two populations
+
+```matlab
+net.architecture.strand_typology.bimodal.method  = 'gaussian';
+net.architecture.strand_typology.bimodal.mean_1  = 10;
+net.architecture.strand_typology.bimodal.mean_2  = 40;
+net.architecture.strand_typology.bimodal.std_1   = 2;
+net.architecture.strand_typology.bimodal.std_2   = 5;
+```
+
+`mean_1` and `mean_2` set the target Kuhn counts for the short and long populations respectively. The standard deviations control the spread within each population.
+
+:::note
+`method = 'gaussian'` draws from Gaussian distributions for each mode. Use `method = 'single'` to assign the means exactly with no spread — useful for controlled studies.
+:::
+
+---
+
+## Step 6 — Set the mixing ratio
+
+```matlab
+net.architecture.strand_typology.bimodal.height_mode = 'prob';
+net.architecture.strand_typology.bimodal.height_prob = 0.4;
+```
+
+`height_prob = 0.4` means 40% of bonds are drawn from the first (short) distribution and 60% from the second (long) distribution. Adjust this ratio to control the mechanical properties of the network.
+
+---
+
+## Step 7 — Configure perbond
+
+```matlab
+net.peratom.Max_peratom_bond = 6;
+net.perbond.kuhn.auto        = true;
+```
+
+---
+
+## Step 8 — Set output flags and generate
+
+```matlab
+net.flags.isave = true;
+net.flags.iplot = true;
+net.flags.ilog  = true;
+net.domain.write_location   = './networks';
+net.domain.lammps_data_file = 'BimodalNetwork';
+
+net.generateNetwork();
+```
+
+---
+
+## Full script
+
+```matlab
+net = network();
+
+net.domain.b        = 1.6;
+net.domain.Lx       = 20;
+net.domain.Ly       = 20;
+net.domain.boundary = 'periodic';
+
+net.architecture.geometry = 'random';
+net.architecture.rho_atom = 0.0078;
+
+net.architecture.strand_typology.mode                   = 'bimodal';
+net.architecture.strand_typology.bimodal.method         = 'gaussian';
+net.architecture.strand_typology.bimodal.mean_1         = 10;
+net.architecture.strand_typology.bimodal.mean_2         = 40;
+net.architecture.strand_typology.bimodal.std_1          = 2;
+net.architecture.strand_typology.bimodal.std_2          = 5;
+net.architecture.strand_typology.bimodal.height_mode    = 'prob';
+net.architecture.strand_typology.bimodal.height_prob    = 0.4;
+
+net.peratom.Max_peratom_bond = 6;
+net.perbond.kuhn.auto        = true;
+
+net.flags.isave = true;
+net.flags.iplot = true;
+net.flags.ilog  = true;
+net.domain.write_location   = './networks';
+net.domain.lammps_data_file = 'BimodalNetwork';
+
+net.generateNetwork();
+```
+
+---
+
+## Next steps
+
+- Build an interpenetrating double network → see [Double networks](../random-advanced/double-networks)
+- Control prestretch independently → see [Mixing assignment modes](../random-advanced/mixing-modes)

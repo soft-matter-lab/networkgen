@@ -1,0 +1,111 @@
+---
+sidebar_position: 3
+---
+
+import TutorialHeader from '@site/src/components/TutorialHeader';
+
+# Advanced polydisperse
+
+<TutorialHeader
+  title="Advanced polydisperse"
+  description="Fine-grained control over polydisperse strand length distributions — including range methods, alignment, and rounding strategies."
+  imagePlaceholder="Advanced poly network image"
+  tags={[{label: 'random'}, {label: 'polydisperse'}, {label: 'PMF'}, {label: 'alignment'}]}
+  difficulty="advanced"
+/>
+
+## Overview
+
+The basic [Polydisperse tutorial](../random-basic/poly) covers the `pmf` method. This tutorial covers the `range` and `geom` methods, alignment of Kuhn counts to bond geometry, and rounding strategies — giving you fine-grained control over exactly how the length distribution is constructed and assigned.
+
+---
+
+## Method comparison
+
+| Method | How it works | When to use |
+|---|---|---|
+| `pmf` | Samples from a Gaussian-like PMF | Controlled mean and spread |
+| `range` | Uniform distribution over a range | Simple min-to-max spread |
+| `geom` | Geometric distribution | Heavy tail of long strands |
+
+---
+
+## Using the range method
+
+```matlab
+net.architecture.strand_typology.mode             = 'polydisperse';
+net.architecture.strand_typology.poly.method      = 'range';
+net.architecture.strand_typology.poly.range_method = 'rank';
+net.architecture.strand_typology.poly.target_min  = 5;
+net.architecture.strand_typology.poly.target_max  = 80;
+```
+
+`range_method = 'rank'` assigns values by rank ordering — the shortest bond gets `target_min`, the longest gets `target_max`, and the rest are distributed proportionally. `'linear'` maps values by linear interpolation instead.
+
+---
+
+## Aligning Kuhn counts to bond geometry
+
+```matlab
+net.architecture.strand_typology.poly.align_to_length = 'ascend';
+```
+
+When set to `'ascend'`, bonds are sorted by their geometric length and assigned Kuhn counts in ascending order — longer bonds get more Kuhn segments. This ensures physical consistency: bonds that are geometrically long have proportionally more extensibility.
+
+:::note
+This is only meaningful when `perbond.kuhn.auto = true`. If you are configuring an independent Kuhn distribution, alignment has no effect.
+:::
+
+---
+
+## Rounding strategies
+
+```matlab
+net.architecture.strand_typology.poly.rounding = 'round'; % or 'ceil', 'floor'
+```
+
+- **round** — nearest integer (default, preserves the distribution mean)
+- **ceil** — always rounds up (skews toward longer strands)
+- **floor** — always rounds down (skews toward shorter strands)
+
+---
+
+## Full script — range method with alignment
+
+```matlab
+net = network();
+
+net.domain.b        = 1.6;
+net.domain.Lx       = 20;
+net.domain.Ly       = 20;
+net.domain.boundary = 'periodic';
+
+net.architecture.geometry = 'random';
+net.architecture.rho_atom = 0.0078;
+
+net.architecture.strand_typology.mode                   = 'polydisperse';
+net.architecture.strand_typology.poly.method            = 'range';
+net.architecture.strand_typology.poly.range_method      = 'rank';
+net.architecture.strand_typology.poly.target_min        = 5;
+net.architecture.strand_typology.poly.target_max        = 80;
+net.architecture.strand_typology.poly.align_to_length   = 'ascend';
+net.architecture.strand_typology.poly.rounding          = 'round';
+
+net.peratom.Max_peratom_bond = 6;
+net.perbond.kuhn.auto        = true;
+
+net.flags.isave = true;
+net.flags.iplot = true;
+net.flags.ilog  = true;
+net.domain.write_location   = './networks';
+net.domain.lammps_data_file = 'AdvPolyNetwork';
+
+net.generateNetwork();
+```
+
+---
+
+## Next steps
+
+- Decouple Kuhn from typology → see [Mixing assignment modes](./mixing-modes)
+- Add a second strand population → see [Bimodal](../random-basic/bimodal)

@@ -1,0 +1,122 @@
+---
+sidebar_position: 2
+---
+
+import TutorialHeader from '@site/src/components/TutorialHeader';
+
+# Mixing assignment modes
+
+<TutorialHeader
+  title="Mixing assignment modes"
+  description="Decouple strand typology from perbond Kuhn assignment to independently control strand length heterogeneity and stiffness heterogeneity in the same network."
+  imagePlaceholder="Mixed assignment mode network image"
+  tags={[{label: 'random'}, {label: 'mono'}, {label: 'advanced perbond'}]}
+  difficulty="advanced"
+/>
+
+## Overview
+
+By default, `perbond.kuhn` copies the same distribution as `strand_typology` — longer strands get more Kuhn segments. This tutorial shows how to break that coupling by setting `kuhn.auto = false` and configuring an independent distribution. This lets you study the effect of stiffness heterogeneity separately from length heterogeneity.
+
+:::note Example scenario
+`strand_typology = 'mono'` (all strands same length) but `perbond.kuhn` uses a polydisperse distribution — giving you a geometrically uniform network with variable bond stiffness.
+:::
+
+---
+
+## Step 1 — Set up a mono random network
+
+```matlab
+net = network();
+
+net.domain.b        = 1.6;
+net.domain.Lx       = 20;
+net.domain.Ly       = 20;
+net.domain.boundary = 'periodic';
+
+net.architecture.geometry             = 'random';
+net.architecture.rho_atom             = 0.0078;
+net.architecture.strand_typology.mode = 'mono';
+net.architecture.strand_typology.mono.value = 20;
+```
+
+---
+
+## Step 2 — Disable kuhn auto mode
+
+```matlab
+net.perbond.kuhn.auto = false;
+```
+
+This tells NetworkGen not to copy `strand_typology` for the Kuhn assignment.
+
+---
+
+## Step 3 — Configure an independent kuhn distribution
+
+```matlab
+net.perbond.kuhn.mode             = 'polydisperse';
+net.perbond.kuhn.poly.method      = 'pmf';
+net.perbond.kuhn.poly.pmf_mean    = 30;
+net.perbond.kuhn.poly.pmf_min     = 5;
+net.perbond.kuhn.poly.pmf_max     = 80;
+net.perbond.kuhn.poly.rounding    = 'round';
+```
+
+The result is a network where all bonds are geometrically equal (`mono`) but have varying stiffness drawn from a polydisperse Kuhn distribution.
+
+:::tip
+You can also reverse this — use `strand_typology = 'polydisperse'` for variable lengths but `perbond.kuhn` with a fixed `mono` value to give all bonds equal stiffness regardless of length.
+:::
+
+---
+
+## Step 4 — Generate
+
+```matlab
+net.peratom.Max_peratom_bond = 6;
+
+net.flags.isave = true;
+net.flags.iplot = true;
+net.flags.ilog  = true;
+net.domain.write_location   = './networks';
+net.domain.lammps_data_file = 'MixedModeNetwork';
+
+net.generateNetwork();
+```
+
+---
+
+## Full script
+
+```matlab
+net = network();
+
+net.domain.b        = 1.6;
+net.domain.Lx       = 20;
+net.domain.Ly       = 20;
+net.domain.boundary = 'periodic';
+
+net.architecture.geometry             = 'random';
+net.architecture.rho_atom             = 0.0078;
+net.architecture.strand_typology.mode = 'mono';
+net.architecture.strand_typology.mono.value = 20;
+
+net.perbond.kuhn.auto              = false;
+net.perbond.kuhn.mode              = 'polydisperse';
+net.perbond.kuhn.poly.method       = 'pmf';
+net.perbond.kuhn.poly.pmf_mean     = 30;
+net.perbond.kuhn.poly.pmf_min      = 5;
+net.perbond.kuhn.poly.pmf_max      = 80;
+net.perbond.kuhn.poly.rounding     = 'round';
+
+net.peratom.Max_peratom_bond = 6;
+
+net.flags.isave = true;
+net.flags.iplot = true;
+net.flags.ilog  = true;
+net.domain.write_location   = './networks';
+net.domain.lammps_data_file = 'MixedModeNetwork';
+
+net.generateNetwork();
+```

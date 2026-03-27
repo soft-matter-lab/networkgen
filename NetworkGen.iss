@@ -100,13 +100,38 @@ Root: HKCU; \
 // Helpers
 // ---------------------------------------------------------------------------
 
+function GetMatlabUserpath(): String;
+// Returns the user MATLAB folder, checking OneDrive first.
+// On machines with OneDrive-synced Documents the path is:
+//   %USERPROFILE%\OneDrive\Documents\MATLAB
+// On standard machines it is:
+//   %USERPROFILE%\Documents\MATLAB  (= {userdocs}\MATLAB)
+var
+  OneDriveDocs : String;
+  StandardDocs : String;
+begin
+  OneDriveDocs := ExpandConstant('{userappdata}');
+  // Walk up from AppData to get %USERPROFILE%
+  OneDriveDocs := ExtractFileDir(ExtractFileDir(OneDriveDocs));
+  OneDriveDocs := OneDriveDocs + '\OneDrive\Documents\MATLAB';
+
+  StandardDocs := ExpandConstant('{userdocs}') + '\MATLAB';
+
+  // Prefer OneDrive path if it already exists (user has OneDrive sync)
+  if DirExists(OneDriveDocs) then
+    Result := OneDriveDocs
+  else
+    Result := StandardDocs;
+end;
+
+
 function GetMatlabStartupFile(): String;
 // Returns the path to the user's MATLAB startup.m.
-// MATLAB's default userpath on Windows is Documents\MATLAB.
+// Uses GetMatlabUserpath() so it works with OneDrive-synced Documents.
 var
   MatlabDir: String;
 begin
-  MatlabDir := ExpandConstant('{userdocs}\MATLAB');
+  MatlabDir := GetMatlabUserpath();
   ForceDirectories(MatlabDir);
   Result := MatlabDir + '\startup.m';
 end;
@@ -206,52 +231,14 @@ end;
 // Default install directory
 // ---------------------------------------------------------------------------
 
+
+
 function GetDefaultInstallDir(Param: String): String;
-// Pre-populates the directory page with Documents\MATLAB\NetworkGen.
-// The user can still change it if needed.
+// Pre-populates the directory page with the correct MATLAB folder.
+// Detects OneDrive-synced Documents automatically.
+// The user can still change the path in the wizard if needed.
 begin
-  Result := ExpandConstant('{userdocs}') + '\MATLAB\NetworkGen';
+  Result := GetMatlabUserpath() + '\NetworkGen';
 end;
 
 
-// ---------------------------------------------------------------------------
-// Upgrade detection — offer to uninstall old version first
-// ---------------------------------------------------------------------------
-
-function InitializeSetup(): Boolean;
-var
-  OldPath     : String;
-  Uninstaller : String;
-  ResultCode  : Integer;
-  Msg         : String;
-begin
-  Result := True;
-
-  // Check registry for an existing install
-  if RegQueryStringValue(HKCU,
-      'Software\SoftMatterLab\NetworkGen',
-      'InstallPath', OldPath) then
-  begin
-    if DirExists(OldPath) then
-    begin
-      Msg := 'An existing NetworkGen installation was found at:' + #13#10
-           + OldPath + #13#10 + #13#10
-           + 'It is recommended to remove it before installing the new version.' + #13#10 + #13#10
-           + 'Remove it now?';
-
-      if MsgBox(Msg, mbConfirmation, MB_YESNO) = IDYES then
-      begin
-        Uninstaller := OldPath + '\unins000.exe';
-        if FileExists(Uninstaller) then
-        begin
-          Exec(Uninstaller, '/SILENT', '', SW_SHOW, ewWaitUntilTerminated, ResultCode);
-        end else
-        begin
-          // No uninstaller found — remove directory and clean startup.m
-          DelTree(OldPath, True, True, True);
-          RemoveStartupPath();
-        end;
-      end;
-    end;
-  end;
-end;

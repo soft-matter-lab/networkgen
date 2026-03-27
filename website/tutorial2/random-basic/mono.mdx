@@ -1,0 +1,132 @@
+---
+sidebar_position: 1
+---
+
+import TutorialHeader from '@site/src/components/TutorialHeader';
+
+# Mono random network
+
+<TutorialHeader
+  title="Mono random network"
+  description="Generate a 2D random polymer network where all strands attempt equal Kuhn lengths. The simplest random network configuration and a good starting point."
+  imagePlaceholder="Mono random network image"
+  tags={[{label: 'random'}, {label: 'mono'}, {label: '2D'}]}
+  difficulty="beginner"
+/>
+
+## Overview
+
+A monodisperse random network places nodes stochastically and assigns all bonds the same target Kuhn count. In practice the geometric constraints of random placement mean bond lengths will vary slightly, but the generator minimises this variation. This is the simplest network type and a good baseline before introducing polydispersity.
+
+---
+
+## Step 1 — Create the network object
+
+```matlab
+net = network();
+```
+
+---
+
+## Step 2 — Set the domain
+
+```matlab
+net.domain.b        = 1.6;
+net.domain.Lx       = 20;
+net.domain.Ly       = 20;
+net.domain.boundary = 'periodic';
+```
+
+:::tip
+For random networks, periodic boundaries avoid artificial stiffening at the edges. Use `'fixed'` if you plan to run a tensile test simulation.
+:::
+
+---
+
+## Step 3 — Configure random geometry
+
+```matlab
+net.architecture.geometry  = 'random';
+net.architecture.rho_atom  = 0.0078;
+```
+
+`rho_atom` is the target node density in atoms per unit area. Increasing it places more nodes in the same domain, producing a denser network.
+
+---
+
+## Step 4 — Set strand typology
+
+```matlab
+net.architecture.strand_typology.mode       = 'mono';
+net.architecture.strand_typology.mono.value = 20;
+```
+
+`mono.value` is the target Kuhn segment count for all bonds. Higher values produce longer, more extensible strands.
+
+---
+
+## Step 5 — Configure per-atom and perbond settings
+
+```matlab
+net.peratom.Max_peratom_bond = 6;
+net.perbond.kuhn.auto        = true;
+```
+
+Setting `kuhn.auto = true` means the Kuhn distribution copies `strand_typology` exactly — no additional configuration needed.
+
+---
+
+## Step 6 — Set output flags
+
+```matlab
+net.flags.isave = true;
+net.flags.iplot = true;
+net.flags.ilog  = true;
+net.domain.write_location   = './networks';
+net.domain.lammps_data_file = 'MonoNetwork';
+```
+
+---
+
+## Step 7 — Generate
+
+```matlab
+net.generateNetwork();
+```
+
+---
+
+## Full script
+
+```matlab
+net = network();
+
+net.domain.b        = 1.6;
+net.domain.Lx       = 20;
+net.domain.Ly       = 20;
+net.domain.boundary = 'periodic';
+
+net.architecture.geometry             = 'random';
+net.architecture.rho_atom             = 0.0078;
+net.architecture.strand_typology.mode = 'mono';
+net.architecture.strand_typology.mono.value = 20;
+
+net.peratom.Max_peratom_bond = 6;
+net.perbond.kuhn.auto        = true;
+
+net.flags.isave = true;
+net.flags.iplot = true;
+net.flags.ilog  = true;
+net.domain.write_location   = './networks';
+net.domain.lammps_data_file = 'MonoNetwork';
+
+net.generateNetwork();
+```
+
+---
+
+## Next steps
+
+- Add a continuous length distribution → see [Polydisperse](./poly)
+- Add two strand populations → see [Bimodal](./bimodal)
+- Add voids and damage → see [Defect generation](/docs/advanced-features/defects)

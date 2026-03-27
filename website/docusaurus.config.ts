@@ -45,6 +45,15 @@ const config: Config = {
         sidebarPath: './sidebars.ts',
       },
     ],
+    [
+      '@docusaurus/plugin-content-docs',
+      {
+        id: 'tutorial2',
+        path: 'tutorial2',
+        routeBasePath: 'tutorial2',
+        sidebarPath: './sidebars.ts',
+      },
+    ],
   ],
 
   presets: [
@@ -106,6 +115,13 @@ const config: Config = {
           position: 'left',
           label: 'Tutorial',
         },
+        {
+          type: 'docSidebar',
+          sidebarId: 'tutorial2Sidebar',
+          docsPluginId: 'tutorial2',
+          position: 'left',
+          label: 'Tutorial2',
+        },
         {to: '/about', label: 'About', position: 'left'},
         { to: '/config-builder', label: 'Config Builder (experimental)', position: 'left' },
         {
@@ -130,23 +146,6 @@ const config: Config = {
               to: '/tutorial/overview',
             },
 
-          ],
-        },
-        {
-          title: 'Community',
-          items: [
-            {
-              label: 'Stack Overflow',
-              href: 'https://stackoverflow.com/questions/tagged/docusaurus',
-            },
-            {
-              label: 'Discord',
-              href: 'https://discordapp.com/invite/docusaurus',
-            },
-            {
-              label: 'X',
-              href: 'https://x.com/docusaurus',
-            },
           ],
         },
         {

@@ -1,0 +1,151 @@
+---
+sidebar_position: 2
+---
+
+import TutorialHeader from '@site/src/components/TutorialHeader';
+
+# Polydisperse random network
+
+<TutorialHeader
+  title="Polydisperse random network"
+  description="Generate a 2D random network where strand Kuhn lengths are drawn from a continuous probability mass function. Produces networks with realistic strand length heterogeneity."
+  imagePlaceholder="Polydisperse network image"
+  tags={[{label: 'random'}, {label: 'polydisperse'}, {label: '2D'}]}
+  difficulty="intermediate"
+/>
+
+## Overview
+
+A polydisperse network draws strand Kuhn counts from a continuous distribution. This tutorial uses the `pmf` method which lets you specify the mean, minimum, and maximum of the distribution directly. The generator samples from this distribution and rounds to integer Kuhn counts.
+
+---
+
+## Step 1 — Create the network object
+
+```matlab
+net = network();
+```
+
+---
+
+## Step 2 — Set the domain
+
+```matlab
+net.domain.b        = 1.6;
+net.domain.Lx       = 20;
+net.domain.Ly       = 20;
+net.domain.boundary = 'periodic';
+```
+
+---
+
+## Step 3 — Configure geometry
+
+```matlab
+net.architecture.geometry = 'random';
+net.architecture.rho_atom = 0.0078;
+```
+
+---
+
+## Step 4 — Set strand typology to polydisperse
+
+```matlab
+net.architecture.strand_typology.mode = 'polydisperse';
+```
+
+---
+
+## Step 5 — Configure the distribution
+
+```matlab
+net.architecture.strand_typology.poly.method   = 'pmf';
+net.architecture.strand_typology.poly.pmf_mean = 40;
+net.architecture.strand_typology.poly.pmf_min  = 5;
+net.architecture.strand_typology.poly.pmf_max  = 120;
+```
+
+`pmf_mean` sets the peak of the distribution. `pmf_min` and `pmf_max` define the hard cutoffs — strands outside this range are capped.
+
+:::tip Choosing bounds
+A good rule of thumb is to set `pmf_min` to roughly `pmf_mean / 4` and `pmf_max` to `3 × pmf_mean`. This gives the distribution room to spread without producing extreme outliers.
+:::
+
+---
+
+## Step 6 — Set rounding and alignment
+
+```matlab
+net.architecture.strand_typology.poly.rounding       = 'round';
+net.architecture.strand_typology.poly.align_to_length = 'none';
+```
+
+`rounding` controls how continuous samples are converted to integers. `align_to_length = 'ascend'` sorts and assigns higher Kuhn counts to geometrically longer bonds — useful when you want strand stiffness to correlate with bond geometry.
+
+---
+
+## Step 7 — Configure perbond
+
+```matlab
+net.peratom.Max_peratom_bond = 6;
+net.perbond.kuhn.auto        = true;
+```
+
+With `auto = true`, `perbond.kuhn` copies the polydisperse distribution exactly — no separate configuration needed.
+
+---
+
+## Step 8 — Set output flags and generate
+
+```matlab
+net.flags.isave = true;
+net.flags.iplot = true;
+net.flags.ilog  = true;
+net.domain.write_location   = './networks';
+net.domain.lammps_data_file = 'PolyNetwork';
+
+net.generateNetwork();
+```
+
+---
+
+## Full script
+
+```matlab
+net = network();
+
+net.domain.b        = 1.6;
+net.domain.Lx       = 20;
+net.domain.Ly       = 20;
+net.domain.boundary = 'periodic';
+
+net.architecture.geometry = 'random';
+net.architecture.rho_atom = 0.0078;
+
+net.architecture.strand_typology.mode             = 'polydisperse';
+net.architecture.strand_typology.poly.method      = 'pmf';
+net.architecture.strand_typology.poly.pmf_mean    = 40;
+net.architecture.strand_typology.poly.pmf_min     = 5;
+net.architecture.strand_typology.poly.pmf_max     = 120;
+net.architecture.strand_typology.poly.rounding    = 'round';
+net.architecture.strand_typology.poly.align_to_length = 'none';
+
+net.peratom.Max_peratom_bond = 6;
+net.perbond.kuhn.auto        = true;
+
+net.flags.isave = true;
+net.flags.iplot = true;
+net.flags.ilog  = true;
+net.domain.write_location   = './networks';
+net.domain.lammps_data_file = 'PolyNetwork';
+
+net.generateNetwork();
+```
+
+---
+
+## Next steps
+
+- Add a second strand population → see [Bimodal](./bimodal)
+- Fine-grained PMF control → see [Advanced polydisperse](../random-advanced/advanced-poly)
+- Decouple Kuhn from typology → see [Mixing assignment modes](../random-advanced/mixing-modes)

@@ -1,0 +1,158 @@
+---
+sidebar_position: 1
+---
+
+import TutorialHeader from '@site/src/components/TutorialHeader';
+
+# Perfect lattice
+
+<TutorialHeader
+  title="Perfect lattice"
+  description="Generate a 2D hexagonal lattice network with optional positional and topological disorder. Produces a LAMMPS data file and visualization output."
+  imagePlaceholder="Hex lattice network image"
+  tags={[{label: 'hex_lattice'}, {label: '2D'}, {label: 'mono'}]}
+  difficulty="beginner"
+/>
+
+## Overview
+
+A lattice network places nodes on a regular hexagonal grid. This gives you a well-defined, repeatable topology that is useful for controlled mechanical studies. You can introduce disorder progressively — first positional (nodes perturbed from ideal positions) and then topological (bonds removed) — to study how defects affect network behaviour.
+
+---
+
+## Step 1 — Create the network object
+
+```matlab
+net = network();
+```
+
+This initialises a `network` object with all default settings. The `architecture`, `perbond`, and other subclasses are automatically created.
+
+---
+
+## Step 2 — Set the domain
+
+```matlab
+net.domain.b    = 1.6;
+net.domain.Lx   = 20;
+net.domain.Ly   = 20;
+net.domain.boundary = 'periodic';
+```
+
+:::tip
+`b` is the fundamental lengthscale — all domain dimensions are in units of `b`. Periodic boundaries are recommended for lattice networks to avoid edge effects.
+:::
+
+---
+
+## Step 3 — Configure the lattice geometry
+
+```matlab
+net.architecture.geometry             = 'hex_lattice';
+net.architecture.lattice_spacing      = 6;
+net.architecture.spacing_multiplier_mode = 'auto';
+```
+
+`lattice_spacing` controls the nominal distance between adjacent nodes. `auto` mode computes the spacing multiplier from the domain and node density automatically.
+
+---
+
+## Step 4 — Set strand typology
+
+```matlab
+net.architecture.strand_typology.mode = 'mono';
+net.architecture.strand_typology.mono.value = 20;
+```
+
+For a perfect lattice the simplest choice is monodisperse — all strands attempt the same Kuhn count. See [Polydisperse](../random-basic/poly) or [Bimodal](../random-basic/bimodal) tutorials to vary this.
+
+---
+
+## Step 5 — Configure per-atom settings
+
+```matlab
+net.peratom.Max_peratom_bond = 6;
+```
+
+For a hexagonal lattice each node has up to 6 neighbours, so set this accordingly. Lower values will cause the generator to drop bonds when the limit is reached.
+
+---
+
+## Step 6 — Optional: add disorder
+
+Skip this step for a perfect lattice. To add positional disorder:
+
+```matlab
+net.architecture.lattice_disorder_level   = 0.3;
+net.architecture.lattice_disorder_maxfrac = 0.4;
+```
+
+To also add topological disorder (random bond removal):
+
+```matlab
+net.architecture.lattice_max_del_per_node = 2;
+net.architecture.lattice_min_degree_keep  = 3;
+```
+
+:::note
+`lattice_disorder_level` ranges from `0` (perfect) to `1` (maximum perturbation). Start with small values and increase gradually.
+:::
+
+---
+
+## Step 7 — Set output flags
+
+```matlab
+net.flags.isave = true;
+net.flags.iplot = true;
+net.flags.ilog  = true;
+net.domain.write_location  = './networks';
+net.domain.lammps_data_file = 'LatticeNetwork';
+```
+
+---
+
+## Step 8 — Generate
+
+```matlab
+net.generateNetwork();
+```
+
+NetworkGen will place nodes, assign bonds, and write the output files to `./networks/`.
+
+---
+
+## Full script
+
+```matlab
+net = network();
+
+net.domain.b         = 1.6;
+net.domain.Lx        = 20;
+net.domain.Ly        = 20;
+net.domain.boundary  = 'periodic';
+
+net.architecture.geometry          = 'hex_lattice';
+net.architecture.lattice_spacing   = 6;
+net.architecture.spacing_multiplier_mode = 'auto';
+net.architecture.strand_typology.mode   = 'mono';
+net.architecture.strand_typology.mono.value = 20;
+
+net.peratom.Max_peratom_bond = 6;
+
+net.flags.isave = true;
+net.flags.iplot = true;
+net.flags.ilog  = true;
+net.domain.write_location   = './networks';
+net.domain.lammps_data_file = 'LatticeNetwork';
+
+net.generateNetwork();
+```
+
+---
+
+## Next steps
+
+- Add defects → see [Defect generation](/docs/advanced-features/defects)
+- Switch to a polydisperse distribution → see [Polydisperse](../random-basic/poly)
+- Try a random geometry → see [Mono random](../random-basic/mono)
