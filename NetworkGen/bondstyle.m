@@ -5,7 +5,7 @@ classdef bondstyle
         type = 1;
 
         %%% per/bond parameters
-        kuhn assignmentmode = assignmentmode();
+        kuhn = assignmentmode();
         % to be added
 
     end

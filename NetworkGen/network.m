@@ -50,7 +50,7 @@ properties
     );
 
     %%% Architecture subclass
-    architecture architecture 
+    architecture = [];
 
     %%% Per/atom
     peratom = struct(...
@@ -59,7 +59,7 @@ properties
     );
 
     %%% Per/bond subclass
-    perbond bondstyle
+    perbond = [];
 
     %%% Defect
     defect = struct(...
@@ -94,7 +94,7 @@ properties
     );
 
     %%% networklog helper class
-    log networklog
+    log = [];
 
 end
 

@@ -7,8 +7,8 @@ net.Nreplicates = 1;
 
 %% ---- Domain ----
 net.domain.b                 = 1.6;
-net.domain.Lx                = 150;
-net.domain.Ly                = 150;
+net.domain.Lx                = 50;
+net.domain.Ly                = 50;
 net.domain.scale             = 1;
 net.domain.boundary          = 'fixed';
 net.domain.write_location    = './networks';
