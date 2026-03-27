@@ -127,7 +127,7 @@ const config: Config = {
             },
             {
               label: 'Tutorial',
-              to: '/tutorial/name',
+              to: '/tutorial/overview',
             },
 
           ],

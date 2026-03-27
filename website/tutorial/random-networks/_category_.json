@@ -1,0 +1,8 @@
+{
+  "label": "Random Networks",
+  "position": 4,
+  "link": {
+    "type": "generated-index",
+    "description": "Start from the default random generator, then tune strand typology and perbond assignments from basic to advanced."
+  }
+}

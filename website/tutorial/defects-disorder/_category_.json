@@ -1,0 +1,8 @@
+{
+  "label": "Defects & Disorder",
+  "position": 5,
+  "link": {
+    "type": "generated-index",
+    "description": "Add lattice disorder or explicit defects only after the base network configuration is stable."
+  }
+}
