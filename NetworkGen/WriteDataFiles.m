@@ -145,16 +145,6 @@ function WriteDataFiles(obj, Atoms, Bonds, Nvec, LDpot)
         bondtable_path, Bond_count, b);
 
     % ---------------------------------------------------------------------
-    % Optional LJ radius info
-    % ---------------------------------------------------------------------
-    if Atom_count > 0 && ~isempty(Nvec)
-        Total_kuhn_segment   = sum(Nvec);
-        Node_assigned_radius = sqrt(Total_kuhn_segment / Atom_count);
-        sigma = Node_assigned_radius / (2^(1/6));
-        obj.log.print('   The 6-12 Lennard-Jones sigma is %g\n', sigma);
-    end
-
-    % ---------------------------------------------------------------------
     % Optional manybody potential file
     % ---------------------------------------------------------------------
     if obj.flags.ipotential && ~isempty(LDpot)

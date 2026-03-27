@@ -23,7 +23,7 @@ net.peratom.Max_peratom_bond        = 6;
 
 %% ---- Strand typology ----
 net.architecture.strand_typology.auto = true;
-net.architecture.strand_typology.mode = 'poly';
+net.architecture.strand_typology.mode = 'mono';
 net.architecture.strand_typology.bimodal.method       = 'gaussian';
 net.architecture.strand_typology.bimodal.mean_1       = 10;
 net.architecture.strand_typology.bimodal.mean_2       = 40;
