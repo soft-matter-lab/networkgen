@@ -1,0 +1,27 @@
+Generating network replicate 1 of 1...
+   Placed 187 atoms in 0.0346 sec
+   Poly/random: placed 555 bonds in 0.1357 sec
+   Kuhn assignment mode: poly (pmf)
+   Kuhn-to-crosslinker ratio 118.2995
+   Average chain length 39.8595
+   [AddDefects] Skipped (flags.idefect = false)
+   [AddHeterogeneities] Geometric disorder skipped (only supported for hex_lattice geometry)
+   [CleanupNetwork] Starting: 187 atoms, 555 bonds
+   [CleanupNetwork] Degree pruning: nothing removed
+   [CleanupNetwork] Single connected component, no fragments removed
+   [CleanupNetwork] Done.  187 atoms (-0), 555 bonds (-0)
+   Constructed LD potential with parameters:
+   Target equilibrium density rho0 = 12.8000
+   Lower cutoff R1 = 4.3506 * b
+   Upper cutoff R2 = 21.7531 * b
+   BPM/spring repulsion cutoff rc = 10.8766 * b
+   Domain scaling skipped (scale = 1).
+   Visualizing network...
+   Computed structural order parameters:
+   Hexatic order phi6 = 0.0375
+   Hexagonal order phi6 = 0.3481
+   Writing network data files...
+   Wrote ..\examples\output\PolyNetwork_PD_SMP0001_N0001.dat with 187 atoms and 555 bonds.
+   Wrote ..\examples\output\bond_PD_SMP0001_N0001.table with 555 entries. b = 1.6
+   The 6-12 Lennard-Jones sigma is 9.68991
+   Wrote ..\examples\output\PD_SMP0001_N0001.localdensity.table
