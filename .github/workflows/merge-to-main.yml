@@ -1,25 +1,30 @@
-name: Version and Deploy on Merge to Main
+name: Version, Release, and Deploy on Merge to Main
 
 on:
   push:
     branches: [main]
 
 permissions:
-  contents: write    # needed to push tags
+  contents: write
+  pages: write
+  id-token: write
 
 jobs:
-  version-and-deploy:
+
+  version:
+    name: Tag and Release
     runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.tag.outputs.tag }}
 
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0          # full history needed for tag sorting
+          fetch-depth: 0
 
       - name: Derive version tag from PR label
         id: tag
         run: |
-          # Find the label on the PR that was just merged
           LABEL=$(gh pr list \
                     --state merged \
                     --base main \
@@ -27,11 +32,9 @@ jobs:
                     --jq 'sort_by(.mergedAt) | last | .labels[].name' \
                   2>/dev/null | grep -E '^major$|^minor$' | tail -1)
 
-          # Get the latest existing vX.Y tag
           LATEST=$(git tag -l 'v*.*' | sort -V | tail -1)
 
           if [ -z "$LATEST" ]; then
-            # No tags yet — start at v1.0
             NEW_TAG="v1.0"
           else
             MAJOR=$(echo $LATEST | sed 's/v//' | cut -d. -f1)
@@ -40,7 +43,6 @@ jobs:
             if [ "$LABEL" = "major" ]; then
               NEW_TAG="v$((MAJOR + 1)).0"
             else
-              # No label or 'minor' both do a minor bump
               NEW_TAG="v${MAJOR}.$((MINOR + 1))"
             fi
           fi
@@ -64,44 +66,47 @@ jobs:
           generate_release_notes: true
           make_latest: true
 
-      # ---- your existing website rebuild steps go here ----
-```
+  build:
+    name: Build Docusaurus
+    needs: version
+    runs-on: ubuntu-latest
 
----
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-### Step 3 — Protect main (optional but recommended)
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: website/package-lock.json
 
-This ensures merges only happen via PR, which is required for the label approach to work reliably:
+      - name: Install dependencies
+        working-directory: website
+        run: npm install --frozen-lockfile
 
-1. Go to **Settings** → **Branches**
-2. Click **Add branch protection rule**
-3. Set branch name pattern: `main`
-4. Check **Require a pull request before merging**
-5. Save
+      - name: Build website
+        working-directory: website
+        run: npm run build
 
-Without this, someone could push directly to main and the label lookup would find nothing, defaulting to a minor bump — which is safe but worth knowing.
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: website/build
 
----
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
 
-### Step 4 — Test it
-
-1. Create a branch off `develop`, make a trivial change
-2. Open a PR from that branch into `main`
-3. Add the `minor` label to the PR
-4. Merge it
-5. Go to **Actions** — you should see the workflow run
-6. Go to **Releases** — you should see `v1.0` (or `v1.1` if you already have tags)
-
-To test a major bump, repeat with the `major` label and confirm it jumps from e.g. `v1.2` → `v2.0`.
-
----
-
-### Day-to-day workflow for your team
-```
-1. Work on feature branch
-2. Open PR: develop → main
-3. Add label:
-      minor  — bug fix, new parameter, refactor
-      major  — breaking config change, new architecture, incompatible output format
-4. Merge PR
-5. CI auto-tags and creates the release
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
