@@ -12,3 +12,9 @@ NetworkGen/networks/mytab.localdensity.table
 NetworkGen/networks/PolyNetwork_nano_200x200.dat
 NetworkGen/AddBondsPoly.asv
 NetworkGen/example_executeClass.asv
+examples/output/PolyNetwork_BD_SMP0001_N0001.dat
+examples/output/PolyNetwork_MD_SMP0001_N0001.dat
+.gitignore
+examples/output/network_BD_SMP0001_N0001.log
+examples/output/MD_SMP0001_N0001.localdensity.table
+examples/output/BD_SMP0001_N0001.localdensity.table
