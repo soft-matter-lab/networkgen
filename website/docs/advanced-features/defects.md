@@ -1,4 +1,5 @@
 ---
+custom_edit_url: null
 sidebar_position: 1
 ---
 
@@ -12,7 +13,7 @@ NetworkGen can introduce voids and damage into the network to simulate pre-exist
 
 | Type | Args | Default |
 |------|------|---------|
-| `string` | `'count'` \| `'area_frac'` | `'count'` |
+| `string` | `'count'` \| `'area_frac'` | `'area_frac'` |
 
 Controls how the number of voids is specified.
 
@@ -43,7 +44,7 @@ net.defect.n_voids = 10;
 
 | Type | Args | Default |
 |------|------|---------|
-| `double` | [0, 1] | — |
+| `double` | [0, 1] | `0.75` |
 
 Target fraction of domain area occupied by voids. Only used when `density_mode = 'area_frac'`.
 
@@ -57,7 +58,7 @@ net.defect.void_area_frac = 0.1; % 10% void area
 
 | Type | Args | Default |
 |------|------|---------|
-| `string` | `'fixed'` \| `'gaussian'` \| `'exponential'` | `'fixed'` |
+| `string` | `'fixed'` \| `'gaussian'` \| `'exponential'` | `'gaussian'` |
 
 Distribution from which void radii are drawn.
 
@@ -71,7 +72,7 @@ net.defect.size_dist = 'gaussian';
 
 | Type | Args | Default |
 |------|------|---------|
-| `double` | (0, ∞) | — |
+| `double` | (0, ∞) | `12` |
 
 Mean void radius in units of `b`.
 
@@ -85,7 +86,7 @@ net.defect.radius_mean = 2.0;
 
 | Type | Args | Default |
 |------|------|---------|
-| `double` | (0, ∞) | — |
+| `double` | (0, ∞) | `4` |
 
 Standard deviation of the void radius distribution. Only used when `size_dist = 'gaussian'`.
 
@@ -99,7 +100,7 @@ net.defect.radius_std = 0.5;
 
 | Type | Args | Default |
 |------|------|---------|
-| `double` | (0, `radius_max`) | — |
+| `double` | (0, `radius_max`) | `2` |
 
 Minimum allowable void radius.
 
@@ -113,7 +114,7 @@ net.defect.radius_min = 0.5;
 
 | Type | Args | Default |
 |------|------|---------|
-| `double` | (`radius_min`, ∞) | — |
+| `double` | (`radius_min`, ∞) | `30` |
 
 Maximum allowable void radius.
 
@@ -127,7 +128,7 @@ net.defect.radius_max = 5.0;
 
 | Type | Args | Default |
 |------|------|---------|
-| `double` | [0, 1] | `0` |
+| `double` | [0, 1] | `0.3` |
 
 Controls the irregularity of void boundaries. `0` = perfectly circular voids, `1` = maximally rough boundaries.
 
@@ -141,7 +142,7 @@ net.defect.shape_roughness = 0.3;
 
 | Type | Args | Default |
 |------|------|---------|
-| `int` | [1, ∞) | — |
+| `int` | [1, ∞) | `2` |
 
 Number of Fourier modes used to generate rough void boundaries. Higher values produce finer-scale roughness.
 
@@ -169,7 +170,7 @@ net.defect.void_overlap = false;
 
 | Type | Args | Default |
 |------|------|---------|
-| `string` | `'random'` \| `'uniform'` \| `'clustered'` | `'random'` |
+| `string` | `'random'` \| `'uniform'` \| `'clustered'` | `'clustered'` |
 
 Controls the spatial distribution of void centers.
 
@@ -187,7 +188,7 @@ net.defect.center_distribution = 'clustered';
 
 | Type | Args | Default |
 |------|------|---------|
-| `double` | [1, ∞) | — |
+| `double` | [1, ∞) | `2` |
 
 Number of cluster parent locations when `center_distribution = 'clustered'`.
 
@@ -201,7 +202,7 @@ net.defect.n_cluster_parents = 3;
 
 | Type | Args | Default |
 |------|------|---------|
-| `double` | (0, ∞) | — |
+| `double` | (0, ∞) | `10` |
 
 Standard deviation of void center positions around each cluster parent, in units of `b`.
 
@@ -215,7 +216,7 @@ net.defect.cluster_spread = 2.0;
 
 | Type | Args | Default |
 |------|------|---------|
-| `double` | [0, 0.5) | — |
+| `double` | [0, 0.5) | `0.15` |
 
 Fraction of the domain size kept clear of void centers near the boundary. Prevents voids from straddling the domain edge.
 
@@ -257,7 +258,7 @@ net.defect.sparse_network = false;
 
 | Type | Args | Default |
 |------|------|---------|
-| `double` | (0, ∞) | — |
+| `double` | (0, ∞) | `1` |
 
 Minimum width of material bridges between closely spaced voids. Prevents voids from merging into a single large void.
 
@@ -271,7 +272,7 @@ net.defect.bridge_width = 1.0;
 
 | Type | Args | Default |
 |------|------|---------|
-| `double` | (0, ∞) | — |
+| `double` | (0, ∞) | `18` |
 
 Thickness of the solid wall region preserved at the domain boundary, in units of `b`.
 
@@ -285,7 +286,7 @@ net.defect.wall_thickness = 2.0;
 
 | Type | Args | Default |
 |------|------|---------|
-| `double` | (0, ∞) | — |
+| `double` | (0, ∞) | `0.12` |
 
 Thickness of the clamped (fixed) region at the domain boundary. Used in conjunction with `boundary = 'fixed'` to define grip regions in tensile test simulations.
 

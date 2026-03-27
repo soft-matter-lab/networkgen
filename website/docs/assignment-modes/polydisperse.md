@@ -1,4 +1,5 @@
 ---
+custom_edit_url: null
 sidebar_position: 4
 ---
 
@@ -12,7 +13,7 @@ The `poly` assignment mode provides fine-grained control over a continuous bond 
 
 | Type | Args | Default |
 |------|------|---------|
-| `string` | `'geom'` \| `'range'` \| `'pmf'` | — |
+| `string` | `'geom'` \| `'range'` \| `'pmf'` | `'pmf'` |
 
 The method used to generate the polydisperse distribution.
 
@@ -44,7 +45,7 @@ net.architecture.strand_typology.poly.min_value = 1;
 
 | Type | Args | Default |
 |------|------|---------|
-| `string` | `'ascend'` \| `'none'` | `'none'` |
+| `string` | `'ascend'` \| `'none'` | `'ascend'` |
 
 When set to `'ascend'`, bonds are sorted and assigned values in ascending order of their length — longer bonds receive larger values.
 
@@ -72,7 +73,7 @@ net.architecture.strand_typology.poly.rounding = 'ceil';
 
 | Type | Args | Default |
 |------|------|---------|
-| `string` | `'rank'` \| `'linear'` | — |
+| `string` | `'rank'` \| `'linear'` | `'rank'` |
 
 Controls how values are mapped across the range when `method = 'range'`.
 

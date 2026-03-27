@@ -1,4 +1,5 @@
 ---
+custom_edit_url: null
 sidebar_position: 2
 ---
 
@@ -12,7 +13,7 @@ These boolean settings control what NetworkGen saves, displays, and logs during 
 
 | Type | Args | Default |
 |------|------|---------|
-| `boolean` | `'true'` \| `'false'` | `'false'` |
+| `boolean` | `'true'` \| `'false'` | `'true'` |
 
 When `true`, writes the LAMMPS data file to `write_location`. This is the primary output file used to run LAMMPS simulations.
 
@@ -26,7 +27,7 @@ net.flags.isave = true;
 
 | Type | Args | Default |
 |------|------|---------|
-| `boolean` | `'true'` \| `'false'` | `'false'` |
+| `boolean` | `'true'` \| `'false'` | `'true'` |
 
 When `true`, opens a MATLAB figure showing a visualization of the generated network. Useful for quick inspection during development but should be disabled for batch generation.
 
@@ -44,7 +45,7 @@ net.flags.iplot = true;
 
 | Type | Args | Default |
 |------|------|---------|
-| `boolean` | `'true'` \| `'false'` | `'false'` |
+| `boolean` | `'true'` \| `'false'` | `'true'` |
 
 When `true`, writes log files containing generation parameters and network statistics to `write_location`.
 
@@ -58,7 +59,7 @@ net.flags.ilog = true;
 
 | Type | Args | Default |
 |------|------|---------|
-| `boolean` | `'true'` \| `'false'` | `'false'` |
+| `boolean` | `'true'` \| `'false'` | `'true'` |
 
 When `true`, automatically appends `smp_number` to output filenames to prevent overwriting. Recommended when generating multiple network realizations.
 
@@ -73,7 +74,7 @@ net.smp_number = 1;
 
 | Type | Args | Default |
 |------|------|---------|
-| `boolean` | `'true'` \| `'false'` | `'false'` |
+| `boolean` | `'true'` \| `'false'` | `'true'` |
 
 When `true`, uses the value of `seed` as the random number generator seed. When `false`, a random seed is used each run.
 
@@ -88,7 +89,7 @@ net.seed = 42;
 
 | Type | Args | Default |
 |------|------|---------|
-| `boolean` | `'true'` \| `'false'` | `'false'` |
+| `boolean` | `'true'` \| `'false'` | `'true'` |
 
 When `true`, activates defect (void) creation in the network. Requires the **Defect** settings to be configured.
 
@@ -107,7 +108,7 @@ net.defect.n_voids = 5;
 
 | Type | Args | Default |
 |------|------|---------|
-| `boolean` | `'true'` \| `'false'` | `'false'` |
+| `boolean` | `'true'` \| `'false'` | `'true'` |
 
 When `true`, writes bond potential lookup tables to a file. Required when using custom non-linear bond potentials in LAMMPS.
 

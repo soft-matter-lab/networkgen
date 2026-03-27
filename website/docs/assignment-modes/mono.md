@@ -1,4 +1,5 @@
 ---
+custom_edit_url: null
 sidebar_position: 2
 ---
 
@@ -12,7 +13,7 @@ The `mono` assignment mode assigns a single fixed value to all bonds. Used when 
 
 | Type | Args | Default |
 |------|------|---------|
-| `double` | (-∞, ∞) | — |
+| `double` | (0, ∞) | `20` |
 
 The fixed value assigned to all bonds. For bond lengths this is typically a positive integer representing the number of Kuhn segments.
 

@@ -1,4 +1,5 @@
 ---
+custom_edit_url: null
 sidebar_position: 1
 ---
 
@@ -12,7 +13,7 @@ These settings define the physical size and shape of the simulation domain, as w
 
 | Type | Args | Default |
 |------|------|---------|
-| `double` | (0, ∞) | `1.0` |
+| `double` | (0, ∞) | `1.6` |
 
 The fundamental lengthscale of the network. All domain dimensions (`Lx`, `Ly`, `Lz`) are specified in units of `b`. Changing `b` effectively rescales the entire network.
 
@@ -82,7 +83,7 @@ net.domain.Lz = 10;
 
 | Type | Args | Default |
 |------|------|---------|
-| `double` | (0, ∞) | `1.0` |
+| `double` | (0, ∞) | `1.6` |
 
 A global rescaling factor applied to the domain after generation. Useful for quickly resizing a network without reconfiguring all domain settings.
 
@@ -132,7 +133,7 @@ net.domain.seed = 42;
 
 | Type | Args | Default |
 |------|------|---------|
-| `string` | any valid path | `'./'` |
+| `string` | any valid path | `'./networks'` |
 
 The directory path where all output files are written. The directory must exist before calling `genNetwork()`.
 
@@ -146,7 +147,7 @@ net.domain.write_location = './output/';
 
 | Type | Args | Default |
 |------|------|---------|
-| `string` | any string | `'network'` |
+| `string` | any string | `'PolyNetwork'` |
 
 Prefix for the LAMMPS data file name. The full filename will be `<prefix>.data`.
 
@@ -160,7 +161,7 @@ net.domain.lammps_data_file = 'my_network';
 
 | Type | Args | Default |
 |------|------|---------|
-| `string` | any string | `'network_viz'` |
+| `string` | any string | `'PolyVisual'` |
 
 Prefix for the LAMMPS visualization file name.
 
@@ -174,7 +175,7 @@ net.domain.lammps_viz_file = 'my_network_viz';
 
 | Type | Args | Default |
 |------|------|---------|
-| `string` | any string | `'bond_table'` |
+| `string` | any string | `'bond'` |
 
 Prefix for the bond potential table file. Only written when `ipotential = true`.
 

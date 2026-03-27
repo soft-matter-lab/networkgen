@@ -1,4 +1,5 @@
 ---
+custom_edit_url: null
 sidebar_position: 5
 ---
 
@@ -16,7 +17,7 @@ These settings must always be configured when using the bimodal mode.
 
 | Type | Args | Default |
 |------|------|---------|
-| `double` | (0, `mean_2`) | — |
+| `double` | (0, `mean_2`) | `35` |
 
 Mean of the first (typically shorter/lower) distribution.
 
@@ -30,7 +31,7 @@ net.architecture.strand_typology.bimodal.mean_1 = 3;
 
 | Type | Args | Default |
 |------|------|---------|
-| `double` | (`mean_1`, ∞) | — |
+| `double` | (`mean_1`, ∞) | `60` |
 
 Mean of the second (typically longer/higher) distribution.
 
@@ -44,7 +45,7 @@ net.architecture.strand_typology.bimodal.mean_2 = 10;
 
 | Type | Args | Default |
 |------|------|---------|
-| `double` | (0, ∞) | — |
+| `double` | (0, ∞) | `10` |
 
 Standard deviation of the first distribution.
 
@@ -58,7 +59,7 @@ net.architecture.strand_typology.bimodal.std_1 = 1.0;
 
 | Type | Args | Default |
 |------|------|---------|
-| `double` | (0, ∞) | — |
+| `double` | (0, ∞) | `5` |
 
 Standard deviation of the second distribution.
 
@@ -72,7 +73,7 @@ net.architecture.strand_typology.bimodal.std_2 = 2.0;
 
 | Type | Args | Default |
 |------|------|---------|
-| `string` | `'single'` \| `'geom'` \| `'gaussian'` | — |
+| `string` | `'single'` \| `'geom'` \| `'gaussian'` | `'gaussian'` |
 
 The method used to generate the bimodal distribution.
 
@@ -90,7 +91,7 @@ net.architecture.strand_typology.bimodal.method = 'gaussian';
 
 | Type | Args | Default |
 |------|------|---------|
-| `string` | `'prob'` \| `'fixed'` | — |
+| `string` | `'prob'` \| `'fixed'` | `'prob'` |
 
 Controls how the relative contribution of each distribution is specified.
 
@@ -107,7 +108,7 @@ net.architecture.strand_typology.bimodal.height_mode = 'prob';
 
 | Type | Args | Default |
 |------|------|---------|
-| `double` | [0, 1] | — |
+| `double` | [0, 1] | `1.0` |
 
 Probability that a value is drawn from the first distribution. Only used when `height_mode = 'prob'`. The remaining fraction `(1 - height_prob)` is drawn from the second distribution.
 
@@ -121,7 +122,7 @@ net.architecture.strand_typology.bimodal.height_prob = 0.4;
 
 | Type | Args | Default |
 |------|------|---------|
-| `int` | [1, ∞) | — |
+| `int` | [1, ∞) | `2` |
 
 Fixed number of values drawn from the first distribution. Only used when `height_mode = 'fixed'`.
 
@@ -155,7 +156,7 @@ The following settings are specifically relevant when using `bimodal` mode for `
 
 | Type | Args | Default |
 |------|------|---------|
-| `double` | (0, ∞) | — |
+| `double` | (0, ∞) | `3` |
 
 Standard deviation of the bond end-to-end length for the first mode. Controls the spread of physical bond extension around the mean end-to-end length derived from `mean_1`. Used in conjunction with `lam_1` to set the target prestretch distribution.
 
@@ -169,7 +170,7 @@ net.architecture.strand_typology.bimodal.stdR_1 = 0.5;
 
 | Type | Args | Default |
 |------|------|---------|
-| `double` | (0, ∞) | — |
+| `double` | (0, ∞) | `10` |
 
 Standard deviation of the bond end-to-end length for the second mode.
 
@@ -183,7 +184,7 @@ net.architecture.strand_typology.bimodal.stdR_2 = 0.8;
 
 | Type | Args | Default |
 |------|------|---------|
-| `double` | (0, 1) | — |
+| `double` | (0, 1) | `0.2` |
 
 Target mean prestretch for bonds in the first mode. Defines the desired mean end-to-end extension relative to the contour length of strands in this mode. Works alongside `auto_1_flag` and `stdR_1` to fully specify the prestretch distribution.
 
@@ -197,7 +198,7 @@ net.architecture.strand_typology.bimodal.lam_1 = 0.5;
 
 | Type | Args | Default |
 |------|------|---------|
-| `double` | (0, 1) | — |
+| `double` | (0, 1) | `0.5` |
 
 Target mean prestretch for bonds in the second mode.
 
@@ -259,7 +260,7 @@ net.architecture.strand_typology.bimodal.double_network_flag = true;
 
 | Type | Args | Default |
 |------|------|---------|
-| `double` | (0, 1) | — |
+| `double` | (0, 1) | `3.0` |
 
 Mesh ratio for the double network. Defines the size of the second sub-network relative to the first — a smaller `alpha` produces a finer second network embedded within the coarser first. Only used when `double_net_flag = true`.
 
@@ -273,7 +274,7 @@ net.architecture.strand_typology.bimodal.alpha = 0.5;
 
 | Type | Args | Default |
 |------|------|---------|
-| `string` | `'manual'` \| `'adaptive'` | `'adaptive'` |
+| `string` | `'manual'` \| `'adaptive'` | `'manual'` |
 
 Controls whether the bin window used to sort bonds into each distribution mode is computed automatically or defined manually.
 
@@ -290,7 +291,7 @@ net.architecture.strand_typology.bimodal.bin_window_method = 'manual';
 
 | Type | Args | Default |
 |------|------|---------|
-| `string` | `'kuhn'` \| `'both'` | — |
+| `string` | `'mixed'` \| `'kuhn'` \| `'both'` | `'mixed'` |
 
 Only used when `bin_window_method = 'manual'`. Specifies which deviation parameters are used to define the bin window.
 

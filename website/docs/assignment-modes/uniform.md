@@ -1,4 +1,5 @@
 ---
+custom_edit_url: null
 sidebar_position: 3
 ---
 
@@ -12,7 +13,7 @@ The `uniform` assignment mode draws bond values from a flat distribution between
 
 | Type | Args | Default |
 |------|------|---------|
-| `double` | (-∞, `max_value`] | — |
+| `double` | (0, ∞) | `5` |
 
 The lower bound of the uniform distribution.
 
@@ -26,7 +27,7 @@ net.architecture.strand_typology.uniform.min_value = 2;
 
 | Type | Args | Default |
 |------|------|---------|
-| `double` | [`min_value`, ∞) | — |
+| `double` | (0, ∞) | `40` |
 
 The upper bound of the uniform distribution.
 
