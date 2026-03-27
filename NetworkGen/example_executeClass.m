@@ -22,8 +22,8 @@ net.architecture.rho_atom           = 0.0078;
 net.peratom.Max_peratom_bond        = 6;
 
 %% ---- Strand typology ----
-net.architecture.strand_typology.auto = true;
-net.architecture.strand_typology.mode = 'poly';
+net.architecture.strand_typology.auto = false;
+net.architecture.strand_typology.mode = 'bimodal';
 net.architecture.strand_typology.bimodal.method       = 'gaussian';
 net.architecture.strand_typology.bimodal.mean_1       = 10;
 net.architecture.strand_typology.bimodal.mean_2       = 40;
@@ -46,7 +46,7 @@ net.architecture.strand_typology.bimodal.stdR_2 = 10;
 net.architecture.strand_typology.mono.value = 100;
 
 %% ---- Perbond ----
-% net.perbond.kuhn.mono.value = 10;
+net.perbond.kuhn.mode = 'mono';
 % net.perbond.kuhn = net.architecture.strand_typology;
 
 %% ---- Flags ----

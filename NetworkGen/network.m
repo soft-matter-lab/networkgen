@@ -108,7 +108,7 @@ methods
         obj.log = networklog();
     end
 
-    function [] = generateNetwork(obj)
+    function [obj] = generateNetwork(obj)
 
         %%% Loop over replicates
         for ii= 1:obj.Nreplicates %Nreps
