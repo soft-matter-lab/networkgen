@@ -152,10 +152,11 @@ methods
             % AssignPerBond should read obj.perbond.* settings and assign
 
             % ---------------------------------------------------------
-            % 7. Add defects
+            % 7. Add heterogeneities (voids, geometric disorder, topo disorder)
             % ---------------------------------------------------------
-            [Atoms, Bonds, Nvec] = AddDefects(obj, Atoms, Bonds, Nvec);
-            % AddDefects should read obj.defect
+            [Atoms, Bonds, Nvec] = AddHeterogeneities(obj, Atoms, Bonds, Nvec);
+            % Dispatcher: calls AddDefects (any geometry),
+            % ApplyGeometricDisorder and ApplyTopologicalDisorder (hex_lattice only)
 
             % ---------------------------------------------------------
             % 8. Clean-up network
