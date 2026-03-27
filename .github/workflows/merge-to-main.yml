@@ -16,6 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       tag: ${{ steps.tag.outputs.tag }}
+      version: ${{ steps.tag.outputs.version }}
 
     steps:
       - uses: actions/checkout@v4
@@ -35,7 +36,7 @@ jobs:
           LATEST=$(git tag -l 'v*.*' | sort -V | tail -1)
 
           if [ -z "$LATEST" ]; then
-            NEW_TAG="v1.0"
+            NEW_TAG="v0.1"
           else
             MAJOR=$(echo $LATEST | sed 's/v//' | cut -d. -f1)
             MINOR=$(echo $LATEST | sed 's/v//' | cut -d. -f2)
@@ -47,7 +48,9 @@ jobs:
             fi
           fi
 
-          echo "tag=$NEW_TAG" >> $GITHUB_OUTPUT
+          VERSION=${NEW_TAG#v}   # strip the leading 'v' for the installer
+          echo "tag=$NEW_TAG"       >> $GITHUB_OUTPUT
+          echo "version=$VERSION"   >> $GITHUB_OUTPUT
           echo "Tagging as $NEW_TAG (label: ${LABEL:-none})"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -59,12 +62,51 @@ jobs:
           git tag ${{ steps.tag.outputs.tag }}
           git push origin ${{ steps.tag.outputs.tag }}
 
+  installer:
+    name: Build Windows Installer
+    needs: version
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Inno Setup
+        run: choco install innosetup --yes
+
+      - name: Build installer
+        run: |
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" `
+            /DAppVersion=${{ needs.version.outputs.version }} `
+            NetworkGen.iss
+        shell: pwsh
+
+      - name: Upload installer artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-installer
+          path: installer_output\*.exe
+
+  release:
+    name: Create GitHub Release
+    needs: [version, installer]
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download installer artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-installer
+          path: installer_output
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ steps.tag.outputs.tag }}
+          tag_name: ${{ needs.version.outputs.tag }}
           generate_release_notes: true
           make_latest: true
+          files: installer_output/*.exe   # attach the installer to the release
 
   build:
     name: Build Docusaurus
