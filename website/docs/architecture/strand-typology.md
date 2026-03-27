@@ -30,17 +30,17 @@ Any perbond property can be configured to copy the same distribution used here. 
 
 ```matlab
 % Mono — generator attempts uniform bond lengths
-net.strand_typology = 'mono';
+net.architecture.strand_typology.mode = 'mono';
 
 % Polydisperse — configure assignment_mode.poly
-net.strand_typology = 'polydisperse';
-net.assignment_mode.auto = false;
-net.assignment_mode.poly.method = 'pmf';
-net.assignment_mode.poly.pmf_mean = 5;
+net.architecture.strand_typology.mode = 'polydisperse';
+net.architecture.strand_typology.auto = false;
+net.architecture.strand_typology.poly.method = 'pmf';
+net.architecture.strand_typology.poly.pmf_mean = 5;
 
 % Bimodal — configure assignment_mode.bimodal
-net.strand_typology = 'bimodal';
-net.assignment_mode.auto = false;
-net.assignment_mode.bimodal.mean_1 = 3;
-net.assignment_mode.bimodal.mean_2 = 8;
+net.architecture.strand_typology.mode = 'bimodal';
+net.architecture.strand_typology.auto = false;
+net.architecture.strand_typology.bimodal.mean_1 = 3;
+net.architecture.strand_typology.bimodal.mean_2 = 8;
 ```

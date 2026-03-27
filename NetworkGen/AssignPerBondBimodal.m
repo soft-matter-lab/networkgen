@@ -29,7 +29,7 @@ function Nvec = AssignPerBondBimodal(obj, Bonds, Atoms)
     if nbonds == 0
         return;
     end
-
+    obj.perbond.kuhn.bimodal = obj.architecture.strand_typology.bimodal; %% DELETE THIS WHEN COPYING WORKS
     bd = obj.perbond.kuhn.bimodal;
     b  = obj.domain.b;
 
@@ -180,8 +180,8 @@ function Nvec = AssignPerBondBimodal(obj, Bonds, Atoms)
             error('AssignPerBondBimodal: unknown bimodal.method "%s".', bd.method);
     end
 
-    fprintf('   Kuhn assignment mode: bimodal (%s)\n', mode);
-    fprintf('   Kuhn-to-crosslinker ratio %0.4f\n', sum(Nvec)/max(natoms,1));
-    fprintf('   Average chain length %0.4f\n', sum(Nvec)/max(length(Nvec),1));
+    obj.log.print('   Kuhn assignment mode: bimodal (%s)\n', mode);
+    obj.log.print('   Kuhn-to-crosslinker ratio %0.4f\n', sum(Nvec)/max(natoms,1));
+    obj.log.print('   Average chain length %0.4f\n', sum(Nvec)/max(length(Nvec),1));
 
 end

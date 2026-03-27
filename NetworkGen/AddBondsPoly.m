@@ -52,11 +52,12 @@ function [AtomsOut, BondsOut] = connect_general_poly(obj, Atoms)
     % Poly topology cutoff:
     % larger than mono to allow broader connection-length distribution
     a = obj.domain.min_node_sep;
-    if isempty(obj.architecture.spacing_multiplier)
-        spacing_multiplier = 1.0;
+    if strcmpi(obj.architecture.spacing_multiplier_mode, 'auto')
+        spacing_multiplier = 4.5;
     else
         spacing_multiplier = obj.architecture.spacing_multiplier;
     end
+
     Rcut = a * spacing_multiplier;
     Rcut2 = Rcut * Rcut;
 
@@ -154,12 +155,12 @@ function [AtomsOut, BondsOut] = connect_general_poly(obj, Atoms)
 
         no_progress = 0;
     end
-    fprintf('   Poly/%s: placed %d bonds in %4.4f sec\n', ...
+    obj.log.print('   Poly/%s: placed %d bonds in %4.4f sec\n', ...
         lower(obj.architecture.geometry), nbond, toc);
 
     BondsRows = BondsRows(1:nbond,:);
 
-    [AtomsOut, BondsOut] = finalize_network(Atoms, BondsRows, ids, x, y, ...
+    [AtomsOut, BondsOut] = finalize_network(obj, Atoms, BondsRows, ids, x, y, ...
         Max_peratom_bond, min_keep, isPeriodic, Lx, Ly, 1);
 
 end
@@ -231,7 +232,7 @@ function d = minimum_image(isPeriodic, dx, dy, Lx, Ly)
 
 end
 
-function [AtomsOut, BondsOut] = finalize_network(Atoms, BondsRows, ids, x, y, ...
+function [AtomsOut, BondsOut] = finalize_network(obj, Atoms, BondsRows, ids, x, y, ...
     Max_peratom_bond, min_keep, isPeriodic, Lx, Ly, bondType)
 
     natom = size(Atoms,1);
@@ -293,7 +294,7 @@ function [AtomsOut, BondsOut] = finalize_network(Atoms, BondsRows, ids, x, y, ..
     if isempty(Atoms) || isempty(BondsRows)
         AtomsOut = zeros(0,5);
         BondsOut = zeros(0,5);
-        fprintf('   Pruned all atoms/bonds\n');
+        obj.log.print('   Pruned all atoms/bonds\n');
         return;
     end
 

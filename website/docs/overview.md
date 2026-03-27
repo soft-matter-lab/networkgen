@@ -12,21 +12,30 @@ NetworkGen is not restricted to just polymer networks, and can be used to genera
 
 The workflow follows three steps:
 
-1. **Create** a network object from the `Network` class
+1. **Create** a network object from the `network` class
 2. **Configure** the object's settings to define the network geometry, strand typology, and output options
-3. **Generate** the network by passing the object to `genNetwork()`
+3. **Generate** the network by calling `generateNetwork()`
 
 ```matlab
-net = network;
-net.Lx = 10;
-net.Ly = 10;
-net.strand_typology = 'polydisperse';
-GenerateNetwork(net);
+net = network();
+net.domain.Lx = 10;
+net.domain.Ly = 10;
+net.architecture.strand_typology.mode = 'poly';
+net.generateNetwork();
 ```
 
 :::note
-Not all settings need to be modified before generation, as they may be ignored depending on the type of network. Only modify the properties needed. 
+Not all settings need to be modified before generation — they may be ignored depending on the type of network. Only modify the properties you need.
 :::
+
+## Running NetworkGen
+
+NetworkGen can be used in two ways:
+
+- **MATLAB** — run `.m` scripts directly in MATLAB R2020a or later
+- **Python** — call NetworkGen from Python via [Octave](https://octave.org/), a free MATLAB-compatible runtime, using the `oct2py` bridge library
+
+See the [Installation guide](./install) for setup instructions for both approaches.
 
 ## Output files
 

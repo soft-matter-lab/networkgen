@@ -15,19 +15,20 @@ properties
         'savemode',             true, ...
         'imanualseed',          false, ...
         'idefect',              false, ...
-        'ipotential',           false ...
+        'ipotential',           true ...
     );
 
     %%% Domain
     domain = struct(...
         'b',                                1.6, ...
-        'Lx',                               10, ...
-        'Ly',                               10, ...
+        'dimension',                        2, ...
+        'Lx',                               150, ...
+        'Ly',                               150, ...
         'Lz',                               10, ...
         'scale',                            1, ...
         'boundary',                         'fixed', ...
         'seed',                             12345, ...
-        'write_location',                   './networks', ...
+        'write_location',                   '../examples/output', ...
         'lammps_data_file',                 'PolyNetwork', ...
         'lammps_viz_file',                  'PolyVisual', ...
         'bond_table_file',                  'bond', ...
@@ -49,16 +50,16 @@ properties
     );
 
     %%% Architecture subclass
-    architecture architecture 
+    architecture = [];
 
     %%% Per/atom
     peratom = struct(...
         'Max_peratom_bond',[], ...
-        'min_degree_keep',[] ...
+        'min_degree_keep',2 ...
     );
 
     %%% Per/bond subclass
-    perbond bondstyle
+    perbond = [];
 
     %%% Defect
     defect = struct(...
@@ -92,9 +93,8 @@ properties
         'rho_max',              500 ...
     );
 
-    %%% log
-    log = struct(...
-    );
+    %%% networklog helper class
+    log = [];
 
 end
 
@@ -102,11 +102,13 @@ methods
 
     % Explicitly initialize subclass objects in the constructor
     function obj = network()
+        warning off backtrace % Suppress stack trace
         obj.architecture = architecture();
         obj.perbond = bondstyle();
+        obj.log = networklog();
     end
 
-    function [] = generateNetwork(obj)
+    function [obj] = generateNetwork(obj)
 
         %%% Loop over replicates
         for ii= 1:obj.Nreplicates %Nreps
@@ -116,10 +118,13 @@ methods
             % ---------------------------------------------------------
             localPrepareReplicate(obj, ii, obj.Nreplicates);
 
+            obj.log.setReplicate(ii); % Set current replicate in log for tracking
+
             % ---------------------------------------------------------
             % 2. Construct domain
             % ---------------------------------------------------------
             SetupDomain(obj);
+            syncKuhnAssignmentFromTopology(obj);
             % New version of SetupDomain should read from obj.domain, obj.arch, ...
             
             % ---------------------------------------------------------
@@ -130,7 +135,7 @@ methods
             % ---------------------------------------------------------
             % 4. Assign per/atom
             % ---------------------------------------------------------
-            Atoms = AssignPerAtom(obj, Atoms);
+            %Atoms = AssignPerAtom(obj, Atoms);
             % AssignPerAtom should read per-atom settings (if any) from obj
            
 
@@ -138,6 +143,7 @@ methods
             % 5. Add bonds
             % ---------------------------------------------------------
             [Atoms, Bonds] = AddBonds(obj, Atoms, LatticeData);
+            syncKuhnAssignmentFromTopology(obj);
 
             % ---------------------------------------------------------
             % 6. Assign per/bond
@@ -146,10 +152,11 @@ methods
             % AssignPerBond should read obj.perbond.* settings and assign
 
             % ---------------------------------------------------------
-            % 7. Add defects
+            % 7. Add heterogeneities (voids, geometric disorder, topo disorder)
             % ---------------------------------------------------------
-            [Atoms, Bonds, Nvec] = AddDefects(obj, Atoms, Bonds, Nvec);
-            % AddDefects should read obj.defect
+            [Atoms, Bonds, Nvec] = AddHeterogeneities(obj, Atoms, Bonds, Nvec);
+            % Dispatcher: calls AddDefects (any geometry),
+            % ApplyGeometricDisorder and ApplyTopologicalDisorder (hex_lattice only)
 
             % ---------------------------------------------------------
             % 8. Clean-up network
@@ -183,8 +190,18 @@ methods
             % ---------------------------------------------------------
             % 13. Write data files
             % ---------------------------------------------------------
-            WriteDataFiles(obj, Atoms, Bonds, Nvec, LDpot, order);
+            WriteDataFiles(obj, Atoms, Bonds, Nvec, LDpot);
 
+            % ---------------------------------------------------------
+            % 14. Write and clear logs
+            % ---------------------------------------------------------
+            outdir = obj.domain.write_location;
+            obj.log.recordNetworkStats(Atoms, Bonds, Nvec, obj, LDpot, order);
+            % Collects statistics across arrays and stores in log object for this replicate
+            
+            obj.log.writeLogs( fullfile(outdir, obj.log.console_log_file), ...
+                   fullfile(outdir, obj.log.network_log_file) );
+            obj.log.clear();
         end
 
     end

@@ -1,4 +1,5 @@
 ---
+custom_edit_url: null
 sidebar_position: 3
 ---
 
@@ -87,7 +88,7 @@ A typical NetworkGen-based LAMMPS simulation uses both:
 
 | Type | Args | Default |
 |------|------|---------|
-| `double` | (0, ∞) | — |
+| `double` | (0, ∞) | `0.414` |
 
 Spring constant for the `local/density` bond potential, in LAMMPS force units.
 
@@ -101,7 +102,7 @@ net.pot.k_LD = 1.0;
 
 | Type | Args | Default |
 |------|------|---------|
-| `int` | [1, ∞) | — |
+| `int` | [1, ∞) | `100000` |
 
 Number of discrete points in the potential lookup table. Higher values produce a smoother potential at the cost of a larger table file.
 
@@ -115,7 +116,7 @@ net.pot.N_rho = 1000;
 
 | Type | Args | Default |
 |------|------|---------|
-| `double` | (0, `rho_max`) | — |
+| `double` | (0, `rho_max`) | `0.0` |
 
 Minimum density value in the potential table.
 
@@ -129,7 +130,7 @@ net.pot.rho_min = 0.01;
 
 | Type | Args | Default |
 |------|------|---------|
-| `double` | (`rho_min`, ∞) | — |
+| `double` | (`rho_min`, ∞) | `500` |
 
 Maximum density value in the potential table.
 
@@ -142,8 +143,8 @@ net.pot.rho_max = 0.99;
 ## Example
 
 ```matlab
-net.ipotential = true;
-net.ilog = true; % outputs equilibrium separation for bpm/spring
+net.flags.ipotential = true;
+net.flags.ilog = true; % outputs equilibrium separation for bpm/spring
 
 % Kuhn auto-coupled to strand_typology
 net.perbond.kuhn.auto = true;

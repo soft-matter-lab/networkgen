@@ -1,4 +1,5 @@
 ---
+custom_edit_url: null
 sidebar_position: 2
 ---
 
@@ -12,12 +13,12 @@ These boolean settings control what NetworkGen saves, displays, and logs during 
 
 | Type | Args | Default |
 |------|------|---------|
-| `boolean` | `'true'` \| `'false'` | `'false'` |
+| `boolean` | `'true'` \| `'false'` | `'true'` |
 
 When `true`, writes the LAMMPS data file to `write_location`. This is the primary output file used to run LAMMPS simulations.
 
 ```matlab
-net.isave = true;
+net.flags.isave = true;
 ```
 
 ---
@@ -26,7 +27,7 @@ net.isave = true;
 
 | Type | Args | Default |
 |------|------|---------|
-| `boolean` | `'true'` \| `'false'` | `'false'` |
+| `boolean` | `'true'` \| `'false'` | `'true'` |
 
 When `true`, opens a MATLAB figure showing a visualization of the generated network. Useful for quick inspection during development but should be disabled for batch generation.
 
@@ -35,7 +36,7 @@ Set `iplot = false` when generating many networks in a loop — rendering plots 
 :::
 
 ```matlab
-net.iplot = true;
+net.flags.iplot = true;
 ```
 
 ---
@@ -44,12 +45,12 @@ net.iplot = true;
 
 | Type | Args | Default |
 |------|------|---------|
-| `boolean` | `'true'` \| `'false'` | `'false'` |
+| `boolean` | `'true'` \| `'false'` | `'true'` |
 
 When `true`, writes log files containing generation parameters and network statistics to `write_location`.
 
 ```matlab
-net.ilog = true;
+net.flags.ilog = true;
 ```
 
 ---
@@ -58,12 +59,12 @@ net.ilog = true;
 
 | Type | Args | Default |
 |------|------|---------|
-| `boolean` | `'true'` \| `'false'` | `'false'` |
+| `boolean` | `'true'` \| `'false'` | `'true'` |
 
 When `true`, automatically appends `smp_number` to output filenames to prevent overwriting. Recommended when generating multiple network realizations.
 
 ```matlab
-net.savemode = true;
+net.flags.savemode = true;
 net.smp_number = 1;
 ```
 
@@ -73,12 +74,12 @@ net.smp_number = 1;
 
 | Type | Args | Default |
 |------|------|---------|
-| `boolean` | `'true'` \| `'false'` | `'false'` |
+| `boolean` | `'true'` \| `'false'` | `'true'` |
 
 When `true`, uses the value of `seed` as the random number generator seed. When `false`, a random seed is used each run.
 
 ```matlab
-net.imanualseed = true;
+net.flags.imanualseed = true;
 net.seed = 42;
 ```
 
@@ -88,7 +89,7 @@ net.seed = 42;
 
 | Type | Args | Default |
 |------|------|---------|
-| `boolean` | `'true'` \| `'false'` | `'false'` |
+| `boolean` | `'true'` \| `'false'` | `'true'` |
 
 When `true`, activates defect (void) creation in the network. Requires the **Defect** settings to be configured.
 
@@ -97,8 +98,8 @@ See [Defects](../advanced-features/defects) for full configuration options.
 :::
 
 ```matlab
-net.idefect = true;
-net.defect.N_voids = 5;
+net.flags.idefect = true;
+net.defect.n_voids = 5;
 ```
 
 ---
@@ -107,7 +108,7 @@ net.defect.N_voids = 5;
 
 | Type | Args | Default |
 |------|------|---------|
-| `boolean` | `'true'` \| `'false'` | `'false'` |
+| `boolean` | `'true'` \| `'false'` | `'true'` |
 
 When `true`, writes bond potential lookup tables to a file. Required when using custom non-linear bond potentials in LAMMPS.
 
@@ -116,5 +117,5 @@ See [Potentials & Perbond](../advanced-features/potentials-perbond) for full con
 :::
 
 ```matlab
-net.ipotential = true;
+net.flags.ipotential = true;
 ```

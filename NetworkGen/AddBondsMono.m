@@ -54,11 +54,12 @@ function [AtomsOut, BondsOut] = connect_random_mono(obj, Atoms)
     % Monodisperse random cutoff:
     % use lattice spacing as the characteristic local bond scale
     a = obj.domain.min_node_sep;
-    if isempty(obj.architecture.spacing_multiplier)
-        spacing_multiplier = 1.2;
+    if strcmpi(obj.architecture.spacing_multiplier_mode, 'auto')
+        spacing_multiplier = 1.8;
     else
         spacing_multiplier = obj.architecture.spacing_multiplier;
     end
+
     Rcut = a * spacing_multiplier;
     Rcut2 = Rcut * Rcut;
 
@@ -157,11 +158,11 @@ function [AtomsOut, BondsOut] = connect_random_mono(obj, Atoms)
 
         no_progress = 0;
     end
-    fprintf('   Mono/random: placed %d bonds in %4.4f sec\n', nbond, toc);
+    obj.log.print('   Mono/random: placed %d bonds in %4.4f sec\n', nbond, toc);
 
     BondsRows = BondsRows(1:nbond,:);
 
-    [AtomsOut, BondsOut] = finalize_network(Atoms, BondsRows, ids, x, y, ...
+    [AtomsOut, BondsOut] = finalize_network(obj, Atoms, BondsRows, ids, x, y, ...
         Max_peratom_bond, min_keep, isPeriodic, Lx, Ly, 1);
 
 end
@@ -288,7 +289,7 @@ function [Atoms, Bonds] = connect_lattice_mono(obj, Atoms, LatticeData)
         Atoms(jj,5 + Atoms(jj,5)) = ii;
     end
 
-    fprintf('   Mono/lattice: placed %d bonds\n', size(Bonds,1));
+    obj.log.print('   Mono/lattice: placed %d bonds\n', size(Bonds,1));
 
 end
 
@@ -359,7 +360,7 @@ function d = minimum_image(isPeriodic, dx, dy, Lx, Ly)
 
 end
 
-function [AtomsOut, BondsOut] = finalize_network(Atoms, BondsRows, ids, x, y, ...
+function [AtomsOut, BondsOut] = finalize_network(obj, Atoms, BondsRows, ids, x, y, ...
     Max_peratom_bond, min_keep, isPeriodic, Lx, Ly, bondType)
 
     natom = size(Atoms,1);
@@ -421,7 +422,7 @@ function [AtomsOut, BondsOut] = finalize_network(Atoms, BondsRows, ids, x, y, ..
     if isempty(Atoms) || isempty(BondsRows)
         AtomsOut = zeros(0,5);
         BondsOut = zeros(0,5);
-        fprintf('   Pruned all atoms/bonds\n');
+        obj.log.print('   Pruned all atoms/bonds\n');
         return;
     end
 

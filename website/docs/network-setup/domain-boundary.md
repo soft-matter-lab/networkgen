@@ -1,4 +1,5 @@
 ---
+custom_edit_url: null
 sidebar_position: 1
 ---
 
@@ -12,12 +13,12 @@ These settings define the physical size and shape of the simulation domain, as w
 
 | Type | Args | Default |
 |------|------|---------|
-| `double` | (0, ∞) | `1.0` |
+| `double` | (0, ∞) | `1.6` |
 
 The fundamental lengthscale of the network. All domain dimensions (`Lx`, `Ly`, `Lz`) are specified in units of `b`. Changing `b` effectively rescales the entire network.
 
 ```matlab
-net.b = 1.0;
+net.domain.b = 1.0;
 ```
 
 ---
@@ -31,7 +32,7 @@ net.b = 1.0;
 Dimensionality of the network. Currently only 2D networks are supported.
 
 ```matlab
-net.dimension = 2;
+net.domain.dimension = 2;
 ```
 
 ---
@@ -45,7 +46,7 @@ net.dimension = 2;
 The x-dimension of the simulation domain in units of `b`.
 
 ```matlab
-net.Lx = 10;
+net.domain.Lx = 10;
 ```
 
 ---
@@ -59,7 +60,7 @@ net.Lx = 10;
 The y-dimension of the simulation domain in units of `b`.
 
 ```matlab
-net.Ly = 10;
+net.domain.Ly = 10;
 ```
 
 ---
@@ -73,7 +74,7 @@ net.Ly = 10;
 The z-dimension of the simulation domain in units of `b`. Only relevant when `dimension = 3`.
 
 ```matlab
-net.Lz = 10;
+net.domain.Lz = 10;
 ```
 
 ---
@@ -82,12 +83,12 @@ net.Lz = 10;
 
 | Type | Args | Default |
 |------|------|---------|
-| `double` | (0, ∞) | `1.0` |
+| `double` | (0, ∞) | `1.6` |
 
 A global rescaling factor applied to the domain after generation. Useful for quickly resizing a network without reconfiguring all domain settings.
 
 ```matlab
-net.scale = 2.0; % doubles the domain size
+net.domain.scale = 2.0; % doubles the domain size
 ```
 
 ---
@@ -104,7 +105,7 @@ Defines the boundary conditions of the simulation domain.
 - **periodic** — the domain wraps in all directions. Suitable for bulk network simulations where edge effects should be avoided.
 
 ```matlab
-net.boundary = 'periodic';
+net.domain.boundary = 'periodic';
 ```
 
 ---
@@ -122,8 +123,8 @@ Always set a manual seed when generating networks for publication or benchmarkin
 :::
 
 ```matlab
-net.imanualseed = true;
-net.seed = 42;
+net.flags.imanualseed = true;
+net.domain.seed = 42;
 ```
 
 ---
@@ -132,12 +133,12 @@ net.seed = 42;
 
 | Type | Args | Default |
 |------|------|---------|
-| `string` | any valid path | `'./'` |
+| `string` | any valid path | `'./networks'` |
 
 The directory path where all output files are written. The directory must exist before calling `genNetwork()`.
 
 ```matlab
-net.write_location = './output/';
+net.domain.write_location = './output/';
 ```
 
 ---
@@ -146,12 +147,12 @@ net.write_location = './output/';
 
 | Type | Args | Default |
 |------|------|---------|
-| `string` | any string | `'network'` |
+| `string` | any string | `'PolyNetwork'` |
 
 Prefix for the LAMMPS data file name. The full filename will be `<prefix>.data`.
 
 ```matlab
-net.lammps_data_file = 'my_network';
+net.domain.lammps_data_file = 'my_network';
 ```
 
 ---
@@ -160,12 +161,12 @@ net.lammps_data_file = 'my_network';
 
 | Type | Args | Default |
 |------|------|---------|
-| `string` | any string | `'network_viz'` |
+| `string` | any string | `'PolyVisual'` |
 
 Prefix for the LAMMPS visualization file name.
 
 ```matlab
-net.lammps_viz_file = 'my_network_viz';
+net.domain.lammps_viz_file = 'my_network_viz';
 ```
 
 ---
@@ -174,12 +175,12 @@ net.lammps_viz_file = 'my_network_viz';
 
 | Type | Args | Default |
 |------|------|---------|
-| `string` | any string | `'bond_table'` |
+| `string` | any string | `'bond'` |
 
 Prefix for the bond potential table file. Only written when `ipotential = true`.
 
 ```matlab
-net.bond_table_file = 'my_bond_table';
+net.domain.bond_table_file = 'my_bond_table';
 ```
 
 ---
@@ -194,7 +195,7 @@ Sample number appended to output filenames when `savemode = true`. Useful for ge
 
 ```matlab
 for i = 1:10
-    net.smp_number = i;
-    genNetwork(net);
+    net.domain.smp_number = i;
+    net.generateNetwork();
 end
 ```
