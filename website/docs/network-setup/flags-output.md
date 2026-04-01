@@ -119,3 +119,32 @@ See [Potentials & Perbond](../advanced-features/potentials-perbond) for full con
 ```matlab
 net.flags.ipotential = true;
 ```
+
+---
+
+### `idumpsettings`
+
+| Type | Args | Default |
+|------|------|---------|
+| `boolean` | `'true'` \| `'false'` | `'false'` |
+
+When `true`, appends the log file by writing the settings. By default it only writes settings the differ from the default properties. For verbose output set `iverbose_settings = 'true'`.
+
+```matlab
+net.flags.idumpsettings = true;
+```
+
+--- 
+
+### `iverbose_settings`
+
+| Type | Args | Default |
+|------|------|---------|
+| `boolean` | `'true'` \| `'false'` | `'false'` |
+
+When `true`, and with `idumpsettings = 'true'` all settings are appended to the log file regardless if they differ from the default settings.
+
+```matlab
+net.flags.iverbose_settings = true;
+```
+

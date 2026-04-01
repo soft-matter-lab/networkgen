@@ -36,6 +36,8 @@ A complete flat reference of all NetworkGen settings. For detailed descriptions 
 | `net.flags.imanualseed` | `boolean` | `true` \| `false` | `false` |
 | `net.flags.idefect` | `boolean` | `true` \| `false` | `false` |
 | `net.flags.ipotential` | `boolean` | `true` \| `false` | `true` |
+| `net.flags.idumpsettings` | `boolean` | `true` \| `false` | `false` |
+| `net.flags.iverbose_settings` | `boolean` | `true` \| `false` | `false` |
 
 ## [Geometry](./architecture/geometry)
 
