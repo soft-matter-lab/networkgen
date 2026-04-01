@@ -309,11 +309,20 @@ function [Atoms, Bonds, Nvec] = AddDefects(obj, Atoms, Bonds, Nvec)
         end
     end
 
-    % Protect clamp-band atoms — they must never be removed
+    % Protect clamp-band atoms (y-boundaries) — they must never be removed
     if clamp_h > 0
         in_clamp               = (atom_y <= clamp_ylo) | (atom_y >= clamp_yhi);
         in_void(in_clamp)       = false;
         near_boundary(in_clamp) = true;
+    end
+
+    % Protect x-boundary atoms in sparse mode.
+    % When margin_frac is large, no voids are placed near the x-edges so
+    % those atoms would never be marked near_boundary and get incorrectly removed.
+    if do_sparse
+        in_x_wall                = (atom_x <= xlo + wall_t) | (atom_x >= xhi - wall_t);
+        in_void(in_x_wall)       = false;
+        near_boundary(in_x_wall) = true;
     end
 
     % Final removal mask
@@ -374,6 +383,16 @@ function [Atoms, Bonds, Nvec] = AddDefects(obj, Atoms, Bonds, Nvec)
         size(Atoms, 1),  n_removed, ...
         size(Bonds, 1),  n_bonds_rm);
 
+    %% ------------------------------------------------------------------
+    %  12.  Secondary thinning pass
+    %       Reduces density in over-dense regions (bridges, untouched patches)
+    %       by probabilistic atom removal weighted by local density.
+    %       Articulation point check (optional) prevents disconnection.
+    %% ------------------------------------------------------------------
+    if isfield(d, 'thinning') && logical(d.thinning) && ~isempty(Atoms) && ~isempty(Bonds)
+        [Atoms, Bonds, Nvec] = local_thin_network(obj, Atoms, Bonds, Nvec);
+    end
+
 end   % end main function
 
 
@@ -409,4 +428,300 @@ function radii = local_sample_radii(n, size_dist, r_mean, r_std, r_min, r_max)
                 'Unknown size_dist "%s"; defaulting to fixed.', size_dist);
             radii = r_mean * ones(n, 1);
     end
+end
+
+
+%% =======================================================================
+%  LOCAL HELPER:  local_thin_network
+%
+%  Secondary thinning pass after primary void placement.
+%  Probabilistically removes atoms in over-dense regions — bridges between
+%  voids and untouched dense patches — while optionally protecting
+%  articulation points (cut vertices) to avoid disconnecting the network.
+%
+%  Reads from obj.defect:
+%    thinning_radius      - neighbourhood radius for local density estimate
+%                           (default: 2.5 × expected node spacing)
+%    thinning_target_frac - target fraction of atoms to keep in dense regions
+%                           (default: 0.4)
+%    thinning_min_keep    - floor: minimum keep fraction anywhere
+%                           (default: 0.1)
+%    thinning_protect_art - if true, never remove articulation points
+%                           (default: true)
+%    thinning_recompute_k - recompute articulation points every k removals
+%                           (default: 20)
+%% =======================================================================
+function [Atoms, Bonds, Nvec] = local_thin_network(obj, Atoms, Bonds, Nvec)
+
+    d = obj.defect;
+
+    % ── Parameters with defaults ────────────────────────────────────────
+    rho_atom   = obj.architecture.rho_atom;
+    avg_spacing = 1.0 / sqrt(max(rho_atom, 1e-10));
+
+    if isfield(d, 'thinning_radius')
+        r_thin = d.thinning_radius;
+    else
+        r_thin = 2.5 * avg_spacing;
+    end
+
+    if isfield(d, 'thinning_target_frac')
+        target_frac = d.thinning_target_frac;
+    else
+        target_frac = 0.4;
+    end
+
+    if isfield(d, 'thinning_min_keep')
+        min_keep = d.thinning_min_keep;
+    else
+        min_keep = 0.1;
+    end
+
+    if isfield(d, 'thinning_protect_art')
+        protect_art = logical(d.thinning_protect_art);
+    else
+        protect_art = true;
+    end
+
+    if isfield(d, 'thinning_recompute_k')
+        recompute_k = max(1, round(d.thinning_recompute_k));
+    else
+        recompute_k = 20;
+    end
+
+    obj.log.print('   [AddDefects:Thin] Starting secondary thinning pass\n');
+    obj.log.print('   [AddDefects:Thin] r_thin=%.1f  target_frac=%.2f  protect_art=%d\n', ...
+        r_thin, target_frac, protect_art);
+
+    natom_before = size(Atoms, 1);
+
+    % ── Atom positions ───────────────────────────────────────────────────
+    atom_ids = Atoms(:, 1);
+    ax       = Atoms(:, 2);
+    ay       = Atoms(:, 3);
+    natom    = numel(atom_ids);
+
+    % Build a fast index: map atom ID -> row index
+    max_id      = max(atom_ids);
+    id_to_row   = zeros(max_id, 1, 'int32');
+    for i = 1:natom
+        id_to_row(atom_ids(i)) = i;
+    end
+
+    % ── Expected atoms in a circle of radius r_thin ──────────────────────
+    expected_in_r = rho_atom * pi * r_thin^2;
+    expected_in_r = max(expected_in_r, 1.0);   % avoid divide-by-zero
+
+    % ── Compute local density for each atom ─────────────────────────────
+    local_density = zeros(natom, 1);
+    for i = 1:natom
+        dx2      = (ax - ax(i)).^2 + (ay - ay(i)).^2;
+        n_in_r   = sum(dx2 <= r_thin^2) - 1;   % exclude self
+        local_density(i) = n_in_r / expected_in_r;
+    end
+
+    % ── Compute removal probability per atom ────────────────────────────
+    % p_remove = 0                     when density <= 1 (at or below average)
+    % p_remove = 1 - target_frac/rho   when density > 1  (over-dense)
+    % clamped so keep fraction never drops below min_keep
+    p_remove = zeros(natom, 1);
+    over_dense = local_density > 1.0;
+    p_remove(over_dense) = 1.0 - target_frac ./ local_density(over_dense);
+    p_remove = min(p_remove, 1.0 - min_keep);
+    p_remove = max(p_remove, 0.0);
+
+    % Sort atoms: remove highest-density first so articulation point
+    % checks reflect the most-congested regions first
+    [~, sort_order] = sort(local_density, 'descend');
+
+    % ── Initial articulation point computation ───────────────────────────
+    alive = true(natom, 1);   % tracks which atoms are still present
+    bond_i = Bonds(:, 2);
+    bond_j = Bonds(:, 3);
+
+    if protect_art
+        is_art = local_find_articulation_points(atom_ids, bond_i, bond_j, alive, id_to_row);
+    else
+        is_art = false(natom, 1);
+    end
+
+    % ── Main removal loop ────────────────────────────────────────────────
+    n_removed   = 0;
+    since_last  = 0;
+
+    for k = 1:natom
+        i = sort_order(k);
+
+        if ~alive(i),        continue; end
+        if p_remove(i) <= 0, continue; end
+        if protect_art && is_art(i), continue; end
+
+        % Probabilistic removal
+        if rand() < p_remove(i)
+            alive(i)   = true;   % mark for removal
+            alive(i)   = false;
+            n_removed  = n_removed + 1;
+            since_last = since_last + 1;
+
+            % Recompute articulation points every recompute_k removals
+            if protect_art && (since_last >= recompute_k)
+                is_art     = local_find_articulation_points(atom_ids, bond_i, bond_j, alive, id_to_row);
+                since_last = 0;
+            end
+        end
+    end
+
+    % Final articulation recompute to be safe before applying
+    if protect_art && since_last > 0
+        is_art = local_find_articulation_points(atom_ids, bond_i, bond_j, alive, id_to_row);
+        % Un-remove any articulation points that slipped through
+        for k = 1:natom
+            if ~alive(k) && is_art(k)
+                alive(k)  = true;
+                n_removed = n_removed - 1;
+            end
+        end
+    end
+
+    % ── Apply removal ────────────────────────────────────────────────────
+    surviving_ids = atom_ids(alive);
+    Atoms = Atoms(alive, :);
+
+    keep_bond = ismember(bond_i, surviving_ids) & ismember(bond_j, surviving_ids);
+    n_bonds_rm = sum(~keep_bond);
+    Bonds = Bonds(keep_bond, :);
+
+    if ~isempty(Nvec)
+        Nvec = Nvec(keep_bond, :);
+    end
+
+    obj.log.print(['   [AddDefects:Thin] Removed %d / %d atoms  ' ...
+                   '(%d bonds removed).  %d atoms remain.\n'], ...
+        n_removed, natom_before, n_bonds_rm, size(Atoms, 1));
+
+end
+
+
+%% =======================================================================
+%  LOCAL HELPER:  local_find_articulation_points
+%
+%  Finds all articulation points (cut vertices) in the graph defined by
+%  atom_ids / bond endpoints using Tarjan's iterative DFS algorithm.
+%  Runs in O(N + M).
+%
+%  Inputs
+%    atom_ids : [N x 1]  atom ID values
+%    bond_i   : [M x 1]  bond endpoint atom IDs (column 2 of Bonds)
+%    bond_j   : [M x 1]  bond endpoint atom IDs (column 3 of Bonds)
+%    alive    : [N x 1]  logical — which atoms are currently present
+%    id_to_row: lookup array, id_to_row(atom_id) = row index in atom_ids
+%
+%  Output
+%    is_art   : [N x 1] logical — true if atom is an articulation point
+%% =======================================================================
+function is_art = local_find_articulation_points(atom_ids, bond_i, bond_j, alive, id_to_row)
+
+    natom  = numel(atom_ids);
+    is_art = false(natom, 1);
+
+    % Build adjacency list for alive atoms only
+    % Only include bonds where both endpoints are alive
+    alive_ids = atom_ids(alive);
+    alive_set = false(numel(id_to_row), 1);
+    alive_set(alive_ids) = true;
+
+    valid_bond = alive_set(bond_i) & alive_set(bond_j);
+    vi = bond_i(valid_bond);
+    vj = bond_j(valid_bond);
+
+    % Map to row indices
+    ri = id_to_row(vi);
+    rj = id_to_row(vj);
+
+    % Build adjacency list
+    adj = cell(natom, 1);
+    for k = 1:numel(ri)
+        a = ri(k);  b = rj(k);
+        if alive(a) && alive(b)
+            adj{a}(end+1) = b;
+            adj{b}(end+1) = a;
+        end
+    end
+
+    % Tarjan's articulation point algorithm — iterative DFS
+    disc    = zeros(natom, 1);   % discovery time
+    low     = zeros(natom, 1);   % low value
+    parent  = zeros(natom, 1);   % parent in DFS tree
+    visited = false(natom, 1);
+    timer   = 0;
+
+    alive_rows = find(alive);
+
+    for start_idx = 1:numel(alive_rows)
+        s = alive_rows(start_idx);
+        if visited(s), continue; end
+
+        % Iterative DFS using explicit stack
+        % Stack entries: [node, parent, child_iterator_index]
+        stack      = zeros(natom, 3, 'int32');
+        stack_top  = 1;
+        stack(1,:) = [s, 0, 1];
+
+        timer      = timer + 1;
+        disc(s)    = timer;
+        low(s)     = timer;
+        visited(s) = true;
+        parent(s)  = -1;   % root has no parent
+
+        while stack_top > 0
+            node      = stack(stack_top, 1);
+            par       = stack(stack_top, 2);
+            child_idx = stack(stack_top, 3);
+
+            nbrs = adj{node};
+
+            if child_idx > numel(nbrs)
+                % Done with this node — pop and update parent's low
+                stack_top = stack_top - 1;
+                if par > 0
+                    low(par) = min(low(par), low(node));
+
+                    % Articulation point check (non-root)
+                    if parent(par) > 0 && low(node) >= disc(par)
+                        is_art(par) = true;
+                    end
+                end
+            else
+                % Advance child iterator
+                stack(stack_top, 3) = child_idx + 1;
+                nb = nbrs(child_idx);
+
+                if ~visited(nb)
+                    timer       = timer + 1;
+                    disc(nb)    = timer;
+                    low(nb)     = timer;
+                    visited(nb) = true;
+                    parent(nb)  = node;
+
+                    stack_top = stack_top + 1;
+                    stack(stack_top, :) = [nb, node, 1];
+
+                elseif nb ~= par
+                    low(node) = min(low(node), disc(nb));
+                    % Update stack entry for back-edge
+                    stack(stack_top, 2) = par;  % keep parent unchanged
+                    % low update already done — re-store node entry
+                    stack(stack_top, 1) = node;
+                end
+            end
+        end
+
+        % Root articulation point check: root is an art point if it has
+        % more than one child in the DFS tree
+        root_children = sum(parent(alive_rows) == s);
+        if root_children > 1
+            is_art(s) = true;
+        end
+    end
+
 end

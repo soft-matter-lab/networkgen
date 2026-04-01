@@ -7,11 +7,11 @@ net.Nreplicates = 1;
 
 %% ---- Domain ----
 net.domain.b                 = 1.6;
-net.domain.Lx                = 50;
-net.domain.Ly                = 50;
+net.domain.Lx                = 150*3;
+net.domain.Ly                = 150*3;
 net.domain.scale             = 1;
 net.domain.boundary          = 'fixed';
-net.domain.write_location    = '../examples/output';
+net.domain.write_location    = './networks';
 net.domain.lammps_data_file  = 'PolyNetwork';
 net.domain.lammps_viz_file   = 'PolyVisual';
 net.domain.smp_number        = 1;
@@ -22,41 +22,58 @@ net.architecture.rho_atom           = 0.0078;
 net.peratom.Max_peratom_bond        = 6;
 
 %% ---- Strand typology ----
-net.architecture.strand_typology.auto = false;
-net.architecture.strand_typology.mode = 'bimodal';
-net.architecture.strand_typology.bimodal.method       = 'gaussian';
-net.architecture.strand_typology.bimodal.mean_1       = 10;
-net.architecture.strand_typology.bimodal.mean_2       = 40;
-net.architecture.strand_typology.bimodal.std_1        = 3;
-net.architecture.strand_typology.bimodal.std_2        = 3;
-net.architecture.strand_typology.bimodal.height_mode  = 'prob';
-net.architecture.strand_typology.bimodal.height_prob  = 0.5;
-net.architecture.strand_typology.bimodal.long_first   = true;
-net.architecture.strand_typology.bimodal.bin_window_method = 'manual';
-net.architecture.strand_typology.bimodal.manual_dev_type = 'mixed';
-net.architecture.strand_typology.bimodal.double_network_flag = true;
-net.architecture.strand_typology.bimodal.alpha = 2.0;
-net.architecture.strand_typology.bimodal.lam_1 = 0.2;
-net.architecture.strand_typology.bimodal.lam_2 = 0.5;
-net.architecture.strand_typology.bimodal.auto_1_flag = true;
-net.architecture.strand_typology.bimodal.auto_2_flag = true;
-net.architecture.strand_typology.bimodal.stdR_1 = 3;
-net.architecture.strand_typology.bimodal.stdR_2 = 10;
+net.architecture.strand_typology.mode = 'poly';
+net.architecture.strand_typology.poly.method   = 'pmf';
+net.architecture.strand_typology.poly.pmf_mean = 5;
+net.architecture.strand_typology.poly.pmf_min  = 3;
+net.architecture.strand_typology.poly.pmf_max  = 8;
+net.architecture.strand_typology.poly.rounding       = 'round';
+net.architecture.strand_typology.poly.align_to_length = 'none';
 
-net.architecture.strand_typology.mono.value = 100;
+net.architecture.spacing_multiplier_mode = 'fixed';
+net.architecture.spacing_multiplier = 2.0;
 
 %% ---- Perbond ----
-net.perbond.kuhn.mode = 'mono';
-% net.perbond.kuhn = net.architecture.strand_typology;
+net.perbond.kuhn.auto = true;
+
+%% ---- Defects ----
+net.defect.density_mode       = 'area_frac';
+net.defect.void_area_frac     = 0.85;
+net.defect.size_dist          = 'exponential';
+net.defect.radius_mean        = 20;  %20
+net.defect.radius_std         = 8;   %8
+net.defect.radius_min         = 5;   %5
+net.defect.radius_max         = 50;  %50
+net.defect.shape_roughness    = 0.3;
+net.defect.shape_n_modes      = 2;
+net.defect.void_overlap       = false;
+net.defect.center_distribution = 'clustered';
+net.defect.n_cluster_parents  = 8;
+net.defect.cluster_spread     = 10;
+net.defect.margin_frac        = 0;  % was 0.15
+net.defect.prune_isolated     = true;
+net.defect.sparse_network     = true;
+net.defect.wall_thickness     = 37.5; % was 37.5
+net.defect.clamp_thickness    = 0.10;
+net.defect.bridge_width       = 0.4;  % was 0.4
+
+net.defect.thinning             = true;
+net.defect.thinning_radius      = 14;    % 14
+net.defect.thinning_target_frac = 0.01;  %
+net.defect.thinning_min_keep    = 0.005;
+net.defect.thinning_protect_art = false;
 
 %% ---- Flags ----
 net.flags.isave      = true;
-net.flags.iplot      = true;
+net.flags.iplot      = false;
 net.flags.ilog       = true;
 net.flags.savemode   = true;
 net.flags.imanualseed = false;
-net.flags.idefect    = false;
+net.flags.idefect    = true;
 net.flags.ipotential = true;
+net.flags.idumpsettings = true;
+net.flags.iversbose_settings
+
 
 %% ---- Generate ----
 net.generateNetwork();

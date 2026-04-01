@@ -334,11 +334,320 @@ methods
                 end
             end
         end
+
     end
 
 
-    function writeNetworkLog(obj, filepath)
+    function dumpNetworkSettings(obj, fid, obj_network, verbose)
+    % Recursively dump all network settings to a file.
+    % Organized by property access path (e.g., domain.b, architecture.geometry).
+    % Skips empty properties in the domain struct.
+    %
+    % Args:
+    %   obj:        the networklog object
+    %   fid:        file ID (from fopen) to write to
+    %   obj_network: the network object to dump
+    %   verbose:    if true, prints all settings; if false, only prints non-default
+
+        if isempty(obj_network)
+            return;
+        end
+
+        % Get default network for comparison
+        default_network = network();
+
+        % Dump top-level properties
+        props = properties(obj_network);
+        for i = 1:numel(props)
+            prop_name = props{i};
+            prop_val = obj_network.(prop_name);
+            default_val = default_network.(prop_name);
+
+            % Skip the log object itself
+            if strcmp(prop_name, 'log')
+                continue;
+            end
+
+            % Handle Nreplicates (scalar)
+            if strcmp(prop_name, 'Nreplicates')
+                if verbose || ~isequal(prop_val, default_val)
+                    fprintf(fid, '  Nreplicates = %s\n', format_value(prop_val, '%.6g'));
+                end
+                continue;
+            end
+
+            % Handle flags (struct)
+            if strcmp(prop_name, 'flags')
+                has_diff = false;
+                if ~verbose
+                    % Check if any flags differ from default
+                    flag_fields = fieldnames(prop_val);
+                    for j = 1:numel(flag_fields)
+                        fname = flag_fields{j};
+                        if ~isequal(prop_val.(fname), default_val.(fname))
+                            has_diff = true;
+                            break;
+                        end
+                    end
+                else
+                    has_diff = true;
+                end
+                
+                if has_diff || verbose
+                    fprintf(fid, '  %% Flags\n');
+                    flag_fields = fieldnames(prop_val);
+                    for j = 1:numel(flag_fields)
+                        fname = flag_fields{j};
+                        fval = prop_val.(fname);
+                        default_fval = default_val.(fname);
+                        if verbose || ~isequal(fval, default_fval)
+                            fprintf(fid, '    flags.%s = %s\n', fname, format_value(fval, '%.6g'));
+                        end
+                    end
+                    fprintf(fid, '\n');
+                end
+                continue;
+            end
+
+            % Handle domain (struct - skip computed/internal properties)
+            if strcmp(prop_name, 'domain')
+                % List of internal/computed fields to skip
+                skip_fields = {'xlo', 'xhi', 'ylo', 'yhi', 'zlo', 'zhi', ...
+                               'Max_atom', 'Max_bond', 'node_scatter_max_tries', ...
+                               'bond_global_try_limit', 'max_attempts_without_progress', ...
+                               'max_tries_per_node_sample', 'min_node_sep', 'min_node_sep2'};
+                
+                has_diff = false;
+                if ~verbose
+                    dom_fields = fieldnames(prop_val);
+                    for j = 1:numel(dom_fields)
+                        fname = dom_fields{j};
+                        % Skip internal fields
+                        if ismember(fname, skip_fields)
+                            continue;
+                        end
+                        fval = prop_val.(fname);
+                        default_fval = default_val.(fname);
+                        if ~isequal(fval, default_fval)
+                            has_diff = true;
+                            break;
+                        end
+                    end
+                else
+                    has_diff = true;
+                end
+                
+                if has_diff || verbose
+                    fprintf(fid, '  %% Domain\n');
+                    dom_fields = fieldnames(prop_val);
+                    for j = 1:numel(dom_fields)
+                        fname = dom_fields{j};
+                        % Skip internal/computed fields
+                        if ismember(fname, skip_fields)
+                            continue;
+                        end
+                        fval = prop_val.(fname);
+                        default_fval = default_val.(fname);
+
+                        if verbose || ~isequal(fval, default_fval)
+                            fprintf(fid, '    domain.%s = %s\n', fname, format_value(fval, '%.6g'));
+                        end
+                    end
+                    fprintf(fid, '\n');
+                end
+                continue;
+            end
+
+            % Handle peratom (struct)
+            if strcmp(prop_name, 'peratom')
+                has_diff = false;
+                if ~verbose
+                    pa_fields = fieldnames(prop_val);
+                    for j = 1:numel(pa_fields)
+                        fname = pa_fields{j};
+                        fval = prop_val.(fname);
+                        if ~isempty(fval) && ~isequal(fval, default_val.(fname))
+                            has_diff = true;
+                            break;
+                        end
+                    end
+                else
+                    has_diff = true;
+                end
+                
+                if has_diff || verbose
+                    fprintf(fid, '  %% Per-atom\n');
+                    pa_fields = fieldnames(prop_val);
+                    for j = 1:numel(pa_fields)
+                        fname = pa_fields{j};
+                        fval = prop_val.(fname);
+                        default_fval = default_val.(fname);
+                        if ~isempty(fval) && (verbose || ~isequal(fval, default_fval))
+                            fprintf(fid, '    peratom.%s = %s\n', fname, format_value(fval, '%.6g'));
+                        end
+                    end
+                    fprintf(fid, '\n');
+                end
+                continue;
+            end
+
+            % Handle defect (struct)
+            if strcmp(prop_name, 'defect')
+                has_diff = false;
+                if ~verbose
+                    def_fields = fieldnames(prop_val);
+                    for j = 1:numel(def_fields)
+                        fname = def_fields{j};
+                        fval = prop_val.(fname);
+                        if ~isempty(fval) && ~isequal(fval, default_val.(fname))
+                            has_diff = true;
+                            break;
+                        end
+                    end
+                else
+                    has_diff = true;
+                end
+                
+                if has_diff || verbose
+                    fprintf(fid, '  %% Defect\n');
+                    def_fields = fieldnames(prop_val);
+                    for j = 1:numel(def_fields)
+                        fname = def_fields{j};
+                        fval = prop_val.(fname);
+                        default_fval = default_val.(fname);
+                        if ~isempty(fval) && (verbose || ~isequal(fval, default_fval))
+                            fprintf(fid, '    defect.%s = %s\n', fname, format_value(fval, '%.6g'));
+                        end
+                    end
+                    fprintf(fid, '\n');
+                end
+                continue;
+            end
+
+            % Handle pot (struct)
+            if strcmp(prop_name, 'pot')
+                has_diff = false;
+                if ~verbose
+                    pot_fields = fieldnames(prop_val);
+                    for j = 1:numel(pot_fields)
+                        fname = pot_fields{j};
+                        fval = prop_val.(fname);
+                        if ~isempty(fval) && ~isequal(fval, default_val.(fname))
+                            has_diff = true;
+                            break;
+                        end
+                    end
+                else
+                    has_diff = true;
+                end
+                
+                if has_diff || verbose
+                    fprintf(fid, '  %% Potential\n');
+                    pot_fields = fieldnames(prop_val);
+                    for j = 1:numel(pot_fields)
+                        fname = pot_fields{j};
+                        fval = prop_val.(fname);
+                        default_fval = default_val.(fname);
+                        if ~isempty(fval) && (verbose || ~isequal(fval, default_fval))
+                            fprintf(fid, '    pot.%s = %s\n', fname, format_value(fval, '%.6g'));
+                        end
+                    end
+                    fprintf(fid, '\n');
+                end
+                continue;
+            end
+
+            % Handle architecture (object)
+            if strcmp(prop_name, 'architecture')
+                % Check if there are any differences from default
+                has_diff = verbose || objectHasDifferences(prop_val, default_val);
+                
+                if has_diff || verbose
+                    fprintf(fid, '  %% Architecture\n');
+                    dumpObjectProperties(obj, fid, prop_val, default_val, 'architecture', verbose);
+                    fprintf(fid, '\n');
+                end
+                continue;
+            end
+
+            % Handle perbond (object)
+            if strcmp(prop_name, 'perbond')
+                % Check if there are any differences from default
+                has_diff = verbose || objectHasDifferences(prop_val, default_val);
+                
+                if has_diff || verbose
+                    fprintf(fid, '  %% Per-bond\n');
+                    dumpObjectProperties(obj, fid, prop_val, default_val, 'perbond', verbose);
+                    fprintf(fid, '\n');
+                end
+                continue;
+            end
+        end
+    end
+
+
+    function dumpObjectProperties(obj, fid, obj_inst, default_inst, prefix, verbose)
+    % Recursively dump properties of an object instance to a file.
+    %
+    % Args:
+    %   obj:          the networklog object
+    %   fid:          file ID (from fopen) to write to
+    %   obj_inst:     the object to dump
+    %   default_inst: the default object for comparison
+    %   prefix:       the access path prefix (e.g., 'architecture')
+    %   verbose:      if true, print all; if false, only differences
+    
+        if isempty(obj_inst)
+            return;
+        end
+
+        props = properties(obj_inst);
+        for i = 1:numel(props)
+            prop_name = props{i};
+            prop_val = obj_inst.(prop_name);
+            
+            default_val = [];
+            if ~isempty(default_inst)
+                default_val = default_inst.(prop_name);
+            end
+
+            % Skip empty values (except for nested objects we want to explore)
+            if isempty(prop_val) && isempty(default_val)
+                continue;
+            end
+
+            % If it's a struct, dump all its fields
+            if isstruct(prop_val)
+                struct_fields = fieldnames(prop_val);
+                for j = 1:numel(struct_fields)
+                    fname = struct_fields{j};
+                    fval = prop_val.(fname);
+                    default_fval = [];
+                    if ~isempty(default_val)
+                        default_fval = default_val.(fname);
+                    end
+                    
+                    if ~isempty(fval) && (verbose || ~isequal(fval, default_fval))
+                        fprintf(fid, '    %s.%s.%s = %s\n', prefix, prop_name, fname, format_value(fval, '%.6g'));
+                    end
+                end
+            % If it's another object (like assignmentmode), recurse
+            elseif isobject(prop_val)
+                dumpObjectProperties(obj, fid, prop_val, default_val, [prefix '.' prop_name], verbose);
+            % Otherwise print as scalar/vector property
+            else
+                if verbose || ~isequal(prop_val, default_val)
+                    fprintf(fid, '    %s.%s = %s\n', prefix, prop_name, format_value(prop_val, '%.6g'));
+                end
+            end
+        end
+    end
+
+
+    function writeNetworkLog(obj, filepath, obj_network)
     % Write structured stats to the exact filepath provided.
+    % If obj_network is provided and idumpsettings flag is enabled,
+    % appends all network settings to the log.
 
         fid = fopen(filepath, 'w');
         if fid < 0
@@ -395,6 +704,16 @@ methods
             end
         end
 
+        % Append network settings if requested
+        if nargin > 2 && ~isempty(obj_network) && isfield(obj_network.flags, 'idumpsettings') && obj_network.flags.idumpsettings
+            fprintf(fid, '\n==========================================================\n');
+            fprintf(fid, 'ALL NETWORK SETTINGS\n');
+            fprintf(fid, '==========================================================\n\n');
+            
+            verbose = isfield(obj_network.flags, 'iversbose_settings') && obj_network.flags.iversbose_settings;
+            dumpNetworkSettings(obj, fid, obj_network, verbose);
+        end
+
         fprintf(fid, '\n==========================================================\n');
         fclose(fid);
 
@@ -407,13 +726,70 @@ methods
     % =================================================================== %
     % Convenience: write both logs
     % =================================================================== %
-    function writeLogs(obj, console_path, network_path)
+    function writeLogs(obj, console_path, network_path, obj_network)
 
         obj.writeConsoleLog(console_path);
-        obj.writeNetworkLog(network_path);
+        
+        if nargin > 3 && ~isempty(obj_network)
+            obj.writeNetworkLog(network_path, obj_network);
+        else
+            obj.writeNetworkLog(network_path);
+        end
     end
 
 end
+end
+
+
+% =========================================================================
+% File-local helper functions
+% =========================================================================
+function hasDiff = objectHasDifferences(obj_inst, default_inst)
+% Check if object has any differences from default
+    hasDiff = false;
+    if isempty(obj_inst) && isempty(default_inst)
+        return;
+    end
+    if isempty(obj_inst) || isempty(default_inst)
+        hasDiff = true;
+        return;
+    end
+    
+    props = properties(obj_inst);
+    for i = 1:numel(props)
+        prop_name = props{i};
+        prop_val = obj_inst.(prop_name);
+        default_val = default_inst.(prop_name);
+        
+        if isempty(prop_val) && isempty(default_val)
+            continue;
+        end
+        if isempty(prop_val) || isempty(default_val)
+            hasDiff = true;
+            return;
+        end
+        
+        if isstruct(prop_val)
+            struct_fields = fieldnames(prop_val);
+            for j = 1:numel(struct_fields)
+                fname = struct_fields{j};
+                if ~isequal(prop_val.(fname), default_val.(fname))
+                    hasDiff = true;
+                    return;
+                end
+            end
+        elseif isobject(prop_val)
+            if objectHasDifferences(prop_val, default_val)
+                hasDiff = true;
+                return;
+            end
+        else
+            if ~isequal(prop_val, default_val)
+                hasDiff = true;
+                return;
+            end
+        end
+    end
 end
 
 
