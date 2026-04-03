@@ -15,6 +15,7 @@ net.domain.write_location    = './networks';
 net.domain.lammps_data_file  = 'PolyNetwork';
 net.domain.lammps_viz_file   = 'PolyVisual';
 net.domain.smp_number        = 1;
+net.domain.seed              = 1852;
 
 %% ---- Architecture ----
 net.architecture.geometry           = 'random';
@@ -31,7 +32,7 @@ net.architecture.strand_typology.poly.rounding       = 'round';
 net.architecture.strand_typology.poly.align_to_length = 'none';
 
 net.architecture.spacing_multiplier_mode = 'fixed';
-net.architecture.spacing_multiplier = 2.0;
+net.architecture.spacing_multiplier = 1.87;
 
 %% ---- Perbond ----
 net.perbond.kuhn.auto = true;
@@ -58,21 +59,29 @@ net.defect.clamp_thickness    = 0.10;
 net.defect.bridge_width       = 0.4;  % was 0.4
 
 net.defect.thinning             = true;
-net.defect.thinning_radius      = 14;    % 14
+net.defect.thinning_radius      = 8.75;  % 14
 net.defect.thinning_target_frac = 0.01;  %
 net.defect.thinning_min_keep    = 0.005;
-net.defect.thinning_protect_art = false;
 
+%
+net.defect.bridging            = true;
+net.defect.bridge_max_dist     = 20;    % 10b ≈ 16 units
+net.defect.bridge_min_spacing  = 8;
+net.defect.bridge_void_thresh  = 0.20;  % midpoint density fraction to qualify as void
+net.defect.bridge_perp_width   = 5;     % 0 = auto (~1 × node spacing ≈ 11 units)
+net.defect.bridge_max_degree   = 0;     % 0 = use Max_peratom_bond
+
+%net.defect.bridge_max_bonds = 50;    % add at most 50 bridge bonds
 %% ---- Flags ----
 net.flags.isave      = true;
 net.flags.iplot      = false;
 net.flags.ilog       = true;
 net.flags.savemode   = true;
-net.flags.imanualseed = false;
+net.flags.imanualseed = true;
 net.flags.idefect    = true;
 net.flags.ipotential = true;
 net.flags.idumpsettings = true;
-net.flags.iversbose_settings
+net.flags.iversbose_settings = true;
 
 
 %% ---- Generate ----
